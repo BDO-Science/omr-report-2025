@@ -1,0 +1,207 @@
+---
+title: "OMR Report"
+author: "Nicole"
+date: '2022-06-22'
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Load packages
+```{r}
+library(tidyverse)
+library(lubridate)
+library(ggpubr)
+```
+# Chipps figure
+```{r}
+#data provided by Jonathan Speegle
+
+chipps <- read.csv("LongfinSmelt/Data/Chipps Island Trawls LFS Oct2023-Jun2024.csv", stringsAsFactors = F)
+chipps$SampleDate<-mdy(chipps$SampleDate)
+
+#filter to >60mm
+chipps.ad <- filter(chipps, ForkLength >= 60)
+
+#plot catch over time
+ggplot(data=chipps.ad, aes(x=SampleDate, y=SumOfCount)) +
+    geom_bar(stat="identity") +
+    theme_bw() +
+    ylab("LFS Catch") +
+    xlab("Month") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b")
+
+ggsave("LongfinSmelt/Plots/chipps_plot.png", height=4, width=7, units="in")
+```
+# SLS & 20mm figure
+```{r}
+#data provided by Vanessa Mora
+
+twentymm <- read.csv("LongfinSmelt/Data/20-mm LFS Catch Data 2024 updated.csv", stringsAsFactors = F)
+twentymm$SampleDate<-mdy(twentymm$Date)
+twentymm$SurveyType <- "20-mm"
+
+sls <- read.csv("LongfinSmelt/Data/SLS LFS Catch Data 2024.csv", stringsAsFactors = F)
+sls$SampleDate<-mdy(sls$Date)
+sls$SurveyType <- "SLS"
+
+#combine datasets
+twentymm2 <- twentymm[c(1,3:4, 8:11)]
+sls2 <- sls[c(1,3:4,7:10)]
+
+survey <- rbind(twentymm2,sls2)
+survey$my <- format(as.Date(survey$SampleDate, format="%m/%Y/%d"),"%m/%y")
+
+#get total catch per region to inform text updates
+year<-survey %>% 
+  group_by(Region) %>% 
+  summarize("Count"= sum(Catch))
+
+#get total catch by month to inform text updates
+totalm<-survey %>% 
+  group_by(my) %>% 
+  summarize("Count"= sum(Catch))
+
+#plot by survey
+#get monthly catch
+month2<-survey %>% 
+  group_by(Region, SurveyType, my) %>% 
+  summarize("Count"= sum(Catch))
+
+#plot
+
+month2$my <- factor(month2$my, levels=c("12/23", "01/24", "02/24", "03/24", "04/24", "05/24", "06/24", "07/24"))
+
+ggplot(data=month2, aes(x=my, y=Count, fill=Region)) +
+    geom_bar(stat = "identity", position="dodge2",  colour="black") +
+    facet_wrap(~SurveyType, ncol=1, scales = "free_y") +
+    theme_bw() +
+    ylab("Count of LFS") +
+    xlab("Month") +
+    theme(legend.position = "right") +
+    theme(text = element_text(size = 14)) +
+    theme(axis.text = element_text(size = 13)) +
+    scale_fill_viridis_d()
+    
+ggsave("LongfinSmelt/Plots/catch_plot2.png", height=8, width=8.5, units="in")
+```
+# SLS & 20mm CSD stations figure
+```{r}
+#survey plot-------------------------------
+survey.csd <- filter(survey, Region == "Central & South Delta")
+survey.csd$Station<-as.character(survey.csd$Station)
+
+survey.csd$SampleDate <- format(as.Date(survey.csd$SampleDate, format="%Y/%m/%d"),"%m/%d/%y")
+
+#sum by station
+csd.surv1<-survey.csd %>% 
+  group_by(SampleDate, SurveyType, Station, Survey) %>% 
+  summarize("Count"= sum(Catch))
+
+csd.surv1$Detec <- ifelse(csd.surv1$Count>0, 1, 0)
+
+#create a new colunm for type and survey #
+csd.surv1$TypeSurv <- paste(csd.surv1$SurveyType, csd.surv1$Survey, sep=" ")
+
+#sum stations with detection by survey
+csd.surv<-csd.surv1 %>% 
+  group_by(SurveyType, TypeSurv) %>% 
+  summarize("detections"= sum(Detec))
+
+#to determine order of the surveys
+#xx<-csd.surv1 %>% group_by(SurveyType, TypeSurv, SampleDate) %>% summarize("detections"= sum(Detec))
+
+csd.surv$TypeSurv <- factor(csd.surv$TypeSurv, levels=c("SLS 12", "SLS 13", "SLS 1", "SLS 2", "SLS 3", "SLS 4", "SLS 5",  "SLS 6", "20-mm 1", "20-mm 2", "20-mm 3", "20-mm 4", "20-mm 5", "20-mm 6", "20-mm 7", "20-mm 8"))
+csd.surv$SurveyType <- factor(csd.surv$SurveyType, levels=c("SLS", "20-mm"))
+
+#plot
+cbbPalette <- c("#999999", "#E69F00")
+
+su <- ggplot(data=csd.surv, aes(x=TypeSurv, y=detections, fill=SurveyType)) +
+    geom_bar(stat = "identity", position="dodge2", width = 0.6, colour="black") +
+    theme_bw() +
+    ylab("Count of CSD stations with LFS detections") +
+    xlab("Survey") +
+    labs(fill='Survey') +
+    scale_fill_manual(values=cbbPalette) +
+    theme(axis.text.x = ele7ment_text(angle = 90))
+su
+surv <- su + geom_hline(yintercept=4, linetype="dashed", color = "black", size = .8)
+surv
+
+#station plot------------------------------
+#average by station
+csd.stat<-survey.csd %>% 
+  group_by(TypeSurv, SurveyType, Station) %>% 
+  summarize("Count"= mean(Catch))
+
+csd.stat$TypeSurv <- factor(csd.stat$TypeSurv, levels=c("SLS 12", "SLS 13", "SLS 1", "SLS 2", "SLS 3", "SLS 4", "SLS 5",  "SLS 6", "20-mm 1", "20-mm 2", "20-mm 3", "20-mm 4", "20-mm 5", "20-mm 6", "20-mm 7", "20-mm 8"))
+
+#see which stations had catch
+catch <- filter(csd.stat, Count > 0)
+unique(catch$Station)
+
+#filter to just these stations to make the plot easier to view
+csd.stat2 <- filter(csd.stat, Station %in% c("809", "812", "815", "901", "902"))
+
+#plot catch by station
+s <- ggplot(data=csd.stat2, aes(x=TypeSurv, y=Count, fill=Station)) +
+    geom_col(position = position_dodge2(width = 0.9, preserve = "single"), colour="black") +
+    theme_bw() +
+    ylab("Average catch per tow of LFS (at CSD stations)") +
+    xlab("Survey Date") +
+    scale_fill_viridis_d() +
+    theme(axis.text.x = element_text(angle = 90))
+s
+stat <- s + geom_hline(yintercept=5, linetype="dashed", color = "black", size = .8)
+stat
+
+#combine----------------------------------
+
+figure <- ggarrange(surv, stat,
+                    labels = c("A)", "B)"), hjust = -2.5, vjust = 2.5,
+                    ncol = 1, nrow = 2)
+figure
+
+ggsave("LongfinSmelt/Plots/survey_station_plot.png", height=8, width=7, units="in")
+
+#notes: 
+#COA 8.4.2 covers larval and juvenile Longfin Smelt (LFS) entrainment protection. One of the  criteria is “From January 1 through June 30, when a single Smelt Larva Survey (SLS) or 20-mm Survey (20-mm) sampling period exceeds one of the following thresholds: LFS catch per tow exceeds five LFS larvae or juveniles in two or more of the 12 stations in the central Delta and south Delta (Stations 809, 812, 815, 901, 902, 906, 910, 912, 914, 915, 918, 919).” Occasionally adverse conditions, such as excessive submerged aquatic vegetation, require survey crews to reduce the tow duration to effectively sample a station. If tow duration is reduced at a station, the catch during that shorter tow shall be expanded to be representative of a standard 10-minute tow to determine if the threshold is exceeded. For example, if three LFS larvae are caught during a five-minute tow the catch will be expanded to six LFS larvae and therefore the threshold will be considered exceeded and the COA triggered. In the case of the 20-mm Survey, which conducts multiple tows at a station, the threshold is considered exceeded if the average of all tows conducted at station, during a single survey, exceeds five LFS larvae.
+```
+# Salvage & OMR flow figure
+```{r}
+#data from: Walter Griffiths
+
+salvage <- read.csv("LongfinSmelt/Data/Total.Salvage_2024.csv",  stringsAsFactors = F)
+salvage$Date<-mdy(salvage$DATE)
+
+#plot seasonal salvage
+salvage$State.Season.Salvage<-as.numeric(salvage$State.Season.Salvage)
+salvage$Federal.Season.Salvage<-as.numeric(salvage$Federal.Season.Salvage)
+
+sal <- ggplot() +
+    geom_line(data=salvage, aes(x=Date, y=State.Season.Salvage), color="blue", linewidth=1) +
+    geom_line(data=salvage, aes(x=Date, y=Federal.Season.Salvage), color="orange", linewidth=1, position=position_dodge(width=0.2)) +
+    theme_bw() +
+    ylab("LFS Seasonal Salvage") +
+    xlab("Date") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+    theme(axis.text = element_text(size = 12)) 
+
+#plot flow
+salvage$OMR <- as.numeric(gsub(",", "", salvage$Middle...Old.R.Net.Daily.Flow..cfs.))
+
+flow <- ggplot() +
+    geom_line(data=salvage, aes(x=Date, y= OMR), linewidth=1) +
+    theme_bw() +
+    ylab("Middle + Old River net daily flow (cfs)") +
+    xlab("Date") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b")+
+    theme(axis.text = element_text(size = 12)) 
+
+figure <- ggarrange(sal, flow,
+                    labels = c("A", "B"),
+                    ncol = 1, nrow = 2)
+figure
+
+ggsave("LongfinSmelt/Plots/2023salvage.png", height=7, width=8, units="in")
+```

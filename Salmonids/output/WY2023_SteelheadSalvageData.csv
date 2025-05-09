@@ -1,0 +1,22 @@
+"Sample.Time","Facility","Species","Adipose.Clip","Count.Duration..minutes.","Pumping.Duration..minutes.","Sample.Fraction","Study.Type","Length","nfish","Expanded.Salvage","Loss","Length.Row.ID","X14.day.OMRI"
+"2024-12-18 15:00:00","SWP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",234,1,4,17.32,1928980,-9712
+"2025-02-04 02:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",260,1,4,2.72,1932594,-4802
+"2025-02-05 13:00:00","SWP","Rainbow / Steelhead Trout","Unclipped",30,60,0.5,"Normal count",299,1,2,8.66,1932637,-4985
+"2025-02-06 11:00:00","SWP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",285,1,4,17.32,1932807,-5190
+"2025-02-06 15:30:00","SWP","Rainbow / Steelhead Trout","Unclipped",NA,NA,NA,"Second flush",227,1,1,4.33,1932790,-5190
+"2025-02-07 16:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",216,1,4,2.72,1933021,-5384
+"2025-02-07 18:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",253,1,4,2.72,1933038,-5384
+"2025-02-08 06:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",260,1,4,2.72,1933131,-5588
+"2025-02-08 18:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",250,1,4,2.72,1933123,-5588
+"2025-02-15 12:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",263,1,4,2.72,1933569,-5799
+"2025-02-16 14:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",227,1,4,2.72,1933660,-5798
+"2025-02-16 16:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",268,1,4,2.72,1933682,-5798
+"2025-02-16 23:59:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",224,1,4,2.72,1933630,-5798
+"2025-02-17 06:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",255,1,4,2.72,1933712,-5728
+"2025-02-17 08:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",252,1,4,2.72,1933788,-5728
+"2025-02-17 08:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",295,1,4,2.72,1933789,-5728
+"2025-02-17 13:00:00","SWP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",240,1,4,17.32,1933476,-5728
+"2025-02-17 16:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",223,1,4,2.72,1933790,-5728
+"2025-02-18 14:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",280,1,4,2.72,1933877,-5640
+"2025-02-18 18:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",238,1,4,2.72,1933853,-5640
+"2025-02-19 10:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",264,1,4,2.72,1934021,-5558
