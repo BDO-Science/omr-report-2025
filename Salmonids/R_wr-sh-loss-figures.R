@@ -3,7 +3,11 @@ library(busdater)
 library(janitor)
 library(zoo)
 
-wy <- get_fy(Sys.Date(), opt_fy_start = '07-01')  #pull the water year based on BY designation in LTO docs
+#############################
+#current WY loss data/figures
+#############################
+
+wy <- get_fy(Sys.Date(), opt_fy_start = '10-01')  #pull the water year based on BY designation in LTO docs
 jpe <- 98893 #set natural winter-run JPE
 jpe_hatch <- 135342 #set hatchery JPE
 
@@ -96,8 +100,9 @@ wr_temp <- wr_loss %>%
   summarize(n = sum(n)) %>%
   mutate(class = 'current')
 
-all <- bind_rows(CVP, SWP) %>%
-  mutate(month = month(SampleDateTime, label = TRUE)) %>%
+wr_by_month <- bind_rows(CVP, SWP) %>%
+  mutate(month = month(SampleDateTime, label = TRUE),
+         wy = get_fy(SampleDateTime, opt_fy_start = '07-01')) %>%
   filter(Genetic_Assignment == 'Winter') %>%
   group_by(month) %>%
   summarize(n = n()) %>%
@@ -109,4 +114,21 @@ all <- bind_rows(CVP, SWP) %>%
   mutate(prop = prop.table(n))
 
 ###historic steelhead
+sh_import_all_years <- read_csv('https://www.cbr.washington.edu/sacramento/data/php/rpt/juv_loss_detail.php?sc=1&outputFormat=csv&year=all&species=2%3Af&dnaOnly=no&age=no') %>%
+  clean_names()
 
+sh_by_month <- sh_import_all_years %>%
+  mutate(date = as.Date(sample_time)) %>%
+  mutate(class = if_else(date >= as.Date('2024-07-01'), 'current', 'historic'),
+         month = month(date, label = TRUE),
+         wy = get_fy(date, opt_fy_start = '07-01')) %>%
+  filter(wy > 2008) %>%
+  group_by(month, class) %>%
+  summarize(loss = sum(loss)) %>%
+  ungroup() %>%
+  na.omit() %>%
+  group_by(class) %>%
+  mutate(prop = prop.table(loss)) %>%
+  mutate(month = factor(month, levels = c('Jul', 'Aug', 'Sep', 'Oct', 'Nov', 
+                                          'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 
+                                          'May', 'Jun')))
