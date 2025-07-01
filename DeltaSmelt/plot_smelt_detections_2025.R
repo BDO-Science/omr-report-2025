@@ -31,26 +31,11 @@ sta_all_sf <- sta_all %>%
 release_info <- read_excel("DeltaSmelt/data/Releases_2025.xlsx") %>%
   clean_names(case = "upper_camel")
 
-# releases <- read_excel("DeltaSmelt/data/release_locations_dates_2024.xlsx") %>%
-#   mutate(Release = case_when(Event == "LS1" ~ "11/15 LS Hard",
-#                              Event == "LS2" ~ "1/10 LS Hard",
-#                              Event == "2a" ~ "12/19 Hard",
-#                              Event == "2b" ~ "12/20 Trailer",
-#                              Event == "3a" ~ "1/24 Hard",
-#                              Event == "3b" ~ "1/25 Soft",
-#                              Event == "4a" ~ "1/31 Trailer",
-#                              Event == "4b" ~ "1/30 Soft",
-#                              Event == "1a" ~ "12/12 Hard",
-#                              Event == "1b" ~ "12/14 Soft"))%>%
-#   mutate(Release = factor(Release, levels = c("11/15 LS Hard","12/12 Hard", 
-#                                               "12/14 Soft","12/19 Hard", "12/20 Trailer", 
-#                                               "1/10 LS Hard","1/24 Hard",
-#                                               "1/25 Soft","1/30 Soft","1/31 Trailer")))%>%
-#   mutate(Mark = if_else(Mark == "Ad", "AdClipped", paste0("VIE-", Mark)))
-# 
-# releases_sf <- release_info %>%
-#   st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
-#   st_transform(crs = st_crs(WW_Delta))
+releases_sf <- release_info %>%
+  mutate(Latitude = as.numeric(Latitude),
+         Longitude = as.numeric(Longitude)) %>%
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
+  st_transform(crs = st_crs(WW_Delta))
 
 ## Read in fish data ----------------------------------------------
 
@@ -70,7 +55,7 @@ data_adult <- read_excel(here::here("DeltaSmelt/data/USFWS_Adult_20250624_KS.xls
 
 # Combine smelt 
 # For now, don't include larval IDs since they are Hypomesus sp.
-allsmelt <- bind_rows(data_usfwsL, data_adult) %>%
+allsmelt <- bind_rows(data_edsmL, data_adult) %>%
   group_by(SampleDate, Source, Gear, Station, LifeStage, Mark, Latitude, Longitude) %>%
   summarize(Catch = sum(Catch, na.rm = TRUE)) %>%
   ungroup()
@@ -199,7 +184,7 @@ map_detections_a
 dev.off()
 
 tiff("DeltaSmelt/output/Figure_map_ljuvDS.tiff", width = 7.8, height = 8.5, units = "in", res = 300, compression = "lzw")
-map_detections_l
+map_detections_lj
 dev.off()
 
 tiff("DeltaSmelt/output/Figure_map_releases.tiff", width = 8.5, height = 8.5, units = "in", res = 300, compression = "lzw")
@@ -225,7 +210,7 @@ smelt_region_totals <- smelt_region %>%
   ungroup() 
   
 
-tiff("DeltaSmelt/output/Figure_Catch_over_time_2024.tiff", width = 6.3, height = 8, units = "in", res = 300, compression = "lzw")
+tiff("DeltaSmelt/output/Figure_Catch_over_time_2025.tiff", width = 7, height = 5, units = "in", res = 300, compression = "lzw")
 ggplot(smelt_region_totals) + 
   geom_col(aes(Date, Total, fill = Region), color = "black") +
   # facet_wrap(LifeStage~., nrow = 2, scales = "free") +
