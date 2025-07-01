@@ -1,55 +1,62 @@
-
 library(dplyr)
 library(readr)
 library(lubridate)
 library(ggplot2)
 library(tidyr)
 library(here)
+library(janitor)
 
+# Code for updating Winter Run Appendix for OMR Report
 
-report_year = 2024
+report_year = 2025
 
 # Escapement -------------------------------------
 
 ## Download data
 url_escapement <- "https://www.cbr.washington.edu/sacramento/data/php/rpt/grandtab_graph.php?sc=1&outputFormat=csv&species=Chinook%3AWinter&type=All&locType=location&location=Sacramento+and+San+Joaquin+River+Systems%3AAll%3AAll"
 escapement <- read_csv(url_escapement) %>%
+  clean_names() %>%
+  rename(Year = end_year_of_monitoring_period) %>%
+  filter(!is.na(population_estimate)) %>%
   mutate(Year2 = as.numeric(substr(Year, start = 1, stop = 4)),
          Year = factor(Year2)) %>%
   filter(Year2 > report_year -10)
 
-
 ## Make plot
 (plot_escapement <- ggplot(escapement) + 
-  geom_col(aes(Year, Annual), fill = "steelblue4") +
-    geom_text(aes(Year, Annual +300, label = Annual), size = 4.5) + 
-  geom_hline(yintercept = mean(escapement$Annual), linetype = "dashed") + 
+  geom_col(aes(Year, population_estimate), fill = "steelblue4") +
+    geom_text(aes(Year, population_estimate +300, label = population_estimate), size = 4.5) + 
+  geom_hline(yintercept = mean(escapement$population_estimate), linetype = "dashed") + 
   labs(y = "Escapement", x = "Brood Year")+
   theme_bw() +
     theme(axis.text = element_text(size = 11),
           axis.title = element_text(size = 12)))
 
 ## Write plot
-tiff("Salmonids/output/Figure_escapement.tiff", width = 7, height = 5, units = "in", res = 300, compression = "lzw")
+tiff("Salmonids/appendix_outputs/Figure_escapement.tiff", width = 7, height = 5, units = "in", res = 300, compression = "lzw")
 plot_escapement
 dev.off()
 
 # JPI ------------------------------
-jpi <- read.csv(here("Salmonids/data/JPI_2002_2023.csv")) %>%
-  filter(BY <= report_year) %>%
-  rename(JPI = Fry.Equivalent.JPI,
-         ETF_Survival = ETF.Survival.Rate....) %>%
-  select(BY, JPI, ETF_Survival) %>%
-  mutate(JPI = JPI/1000000,
-         JPI_lab = round(JPI, 2),
-         ETF_Survival_lab = round(ETF_Survival)) %>%
-  filter(BY > report_year - 11) %>%
-  mutate(BY = factor(BY)) 
+# JPI spreadsheet data from JPE letter. 
+# USFWS (Bill Poytress) will eventually update some of the values from 2022 on.
+
+jpi <- read_csv(here("Salmonids/data/JPI_2002_2024.csv")) %>%
+  clean_names() %>%
+  filter(by <= report_year) %>%
+  rename(jpi = fry_equivalent_jpi,
+         etf_survival = etf_survival_rate_percent) %>%
+  select(by, jpi, etf_survival) %>%
+  mutate(jpi = jpi/1000000,
+         jpi_lab = round(jpi, 2),
+         etf_survival_lab = round(etf_survival)) %>%
+  filter(by > report_year - 11) %>%
+  mutate(by = factor(by)) 
 
 (plot_jpi <- ggplot(jpi) + 
-    geom_col(aes(BY, JPI), fill = "palegreen4", alpha = 0.8, width = 0.8) +
-    geom_text(aes(BY, JPI+0.15, label = JPI_lab), size = 4.5) + 
-    geom_hline(yintercept = mean(jpi$JPI), linetype = "dashed") + 
+    geom_col(aes(by, jpi), fill = "palegreen4", alpha = 0.8, width = 0.8) +
+    geom_text(aes(by,jpi+0.15, label = jpi_lab), size = 4.5) + 
+    geom_hline(yintercept = mean(jpi$jpi), linetype = "dashed") + 
     labs(y = "Juvenile Production Index (millions)") +
     scale_y_continuous() + 
     theme_classic() +
@@ -59,13 +66,14 @@ jpi <- read.csv(here("Salmonids/data/JPI_2002_2023.csv")) %>%
           axis.title.x = element_blank()))
 
 ## Write plot
-tiff("Salmonids/output/Figure_jpi.tiff", width = 8, height = 6, units = "in", res = 300, compression = "lzw")
+tiff("Salmonids/appendix_outputs/Figure_wr_jpi.tiff", width = 8, height = 6, units = "in", res = 300, compression = "lzw")
 plot_jpi
 dev.off()
 
 # TDM and ETF --------------------------------------
+# TDM Data from CVTEMP
 
-tdm <- read.csv(here("Salmonids/data/ETF_TDM_2002_2023.csv")) %>%
+tdm <- read.csv(here("Salmonids/data/ETF_TDM_2002_2024.csv")) %>%
   mutate(unexplained_mortality = 100-ETF_Survival-TDM_NOAA_percent) %>%
   rename(ETF_survival = ETF_Survival) %>%
   filter(Brood.Year > report_year-11) %>%
@@ -89,7 +97,7 @@ yrcolors <- rev(tdm$color)
 
 (plot_tdm_only<- ggplot(tdm) + 
     geom_col(aes(Brood.Year, TDM_NOAA_percent), fill = "steelblue", alpha = 0.8) +
-    geom_text(aes(Brood.Year, TDM_NOAA_percent +2, label = TDM_NOAA_percent), size =  4) + 
+    geom_text(aes(Brood.Year, TDM_NOAA_percent +2, label = round(TDM_NOAA_percent)), size =  4) + 
     geom_hline(yintercept = mean(tdm$TDM_NOAA_percent), linetype = "dashed") + 
     labs(y = "Temperature Dependent\n Mortality (%)", x = "Brood Year") +
     # scale_y_continuous(expand = c(0,0)) + 
@@ -112,9 +120,9 @@ yrcolors <- rev(tdm$color)
           legend.title = element_blank()))
 
 (plot_etf <- ggplot(jpi) + 
-    geom_col(aes(BY, ETF_Survival), fill = "goldenrod", alpha = 0.8, width = 0.8) +
-    geom_text(aes(BY, ETF_Survival +1, label = ETF_Survival_lab), size =  4) + 
-    geom_hline(yintercept = mean(jpi$ETF_Survival), linetype = "dashed") + 
+    geom_col(aes(by, etf_survival), fill = "goldenrod", alpha = 0.8, width = 0.8) +
+    geom_text(aes(by, etf_survival +2, label = etf_survival_lab), size =  4) + 
+    geom_hline(yintercept = mean(jpi$etf_survival), linetype = "dashed") + 
     labs(y = "Egg-to-Fry Survival (%)") +
     # scale_y_continuous(expand = c(0,0)) + 
     theme_classic() +
@@ -124,21 +132,22 @@ yrcolors <- rev(tdm$color)
           axis.title.x = element_blank()))
 
 ## Write plot
-tiff("Salmonids/output/Figure_tdm.tiff", width = 7, height = 5, units = "in", res = 300, compression = "lzw")
+tiff("Salmonids/appendix_outputs/Figure_wr_tdm.tiff", width = 7, height = 5, units = "in", res = 300, compression = "lzw")
 plot_tdm
 dev.off()
 
-tiff("Salmonids/output/Figure_tdm_only.tiff", width = 7, height = 4, units = "in", res = 300, compression = "lzw")
+tiff("Salmonids/appendix_outputs/Figure_wr_tdm_only.tiff", width = 7, height = 4, units = "in", res = 300, compression = "lzw")
 plot_tdm_only
 dev.off()
 
-tiff("Salmonids/output/Figure_etf.tiff", width = 7, height = 5, units = "in", res = 300, compression = "lzw")
+tiff("Salmonids/appendix_outputs/Figure_wr_etf.tiff", width = 7, height = 5, units = "in", res = 300, compression = "lzw")
 plot_etf
 dev.off()
 
 # Hatchery Survival ---------------------------------------------
-
-## Read in data. Add Brood year as a variable to match other plots
+## This data comes from CalFishTrack. https://oceanview.pfeg.noaa.gov/CalFishTrack/pageLSWR_2025.html
+## Tables 3.2 and 3.3 - manually added info to spreadsheet.
+## Read in data. Add Brood year as a variable to match other plots. 
 hatchery <- readxl::read_excel(here::here("Salmonids/data/HatcheryWinterRunSurvival.xlsx")) %>%
   mutate(BY = factor(BY),
          Metric_label = case_when(Metric == "Benicia" ~ "Minimum Survival to Benicia Bridge East Span (95% CI)",
@@ -169,13 +178,15 @@ delta <- ggplot(hatchery_delta) +
   theme(axis.text.x = element_text(size = 12),
         axis.title = element_text(size = 13),
         strip.text = element_text(size = 12))
+mean(hatchery_benicia$Survival)
+mean(hatchery_delta$Survival)
 
 ## Combine plots
 library(patchwork) 
 (survival_plot <- delta / ben)
 
 ## Write plot
-tiff("Salmonids/output/Figure_hatcherysurvival.tiff", width = 6, height =7, units = "in", res = 300, compression = "lzw")
+tiff("Salmonids/appendix_outputs/Figure_wr_hatcherysurvival.tiff", width = 6, height =7, units = "in", res = 300, compression = "lzw")
 survival_plot
 dev.off()
 
