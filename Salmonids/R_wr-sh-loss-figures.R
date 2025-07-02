@@ -79,6 +79,357 @@ sh_weekly <- data.frame(date = seq(as.Date('2024-12-01'), as.Date('2025-06-30'),
   mutate(sum_7D_loss = rollsum(loss, k = 7, fill = NA, align = 'right')) %>%
   filter(date >= as.Date(paste0(wy,'-01-01')))
 
+# 1. Tag & bind your weekly tables ------------------------------
+
+SH_weekly_WY <- sh_weekly %>%
+  rename(Date = date) %>%           # unify the date column name
+  mutate(species = "Steelhead")
+
+wr_weekly_WY <- wr_weekly %>%
+  rename(Date = date) %>%
+  mutate(species = "Winter-run")
+
+combined_weekly <- bind_rows(SH_weekly_WY, wr_weekly_WY) %>%
+  arrange(species, Date) %>%
+  group_by(species) %>%
+  mutate(
+    cumul_loss = cumsum(loss)       # cumulative loss over the water year
+  ) %>%
+  ungroup()
+
+
+# 2. (Optional) hline for Steelhead’s one-time 120 threshold ----
+
+hline_data <- tibble(
+  species      = "Steelhead",
+  yintercept   = 120
+)
+
+
+# 3. Plot ----------------------------------------------------------
+
+p <- ggplot(combined_weekly) +
+  # bars, now filled by facility
+  #geom_col(aes(x = Date, y = loss, fill = facility),
+           #position = "dodge", alpha = 0.7) +
+  geom_line(aes(x = Date, y = sum_7D_loss, color = "weekly loss"), # 7-day rolling sum
+            size = 1) +
+  geom_line(aes(x = Date, y = threshold, color = "weekly threshold"), # distributed-loss threshold
+            linetype = "dotted", size = 1) +
+  #geom_line(aes(x = Date, y = cumul_loss, color = "cumulative loss"),   # cumulative loss
+            #linetype = "dashed", size = 1) +
+  facet_wrap(~ species, scales = "free_y") +
+  scale_fill_viridis_d(name = "Facility", option = "viridis") +   # viridis scales
+  scale_color_viridis_d(name = "", begin = 0.1, end = 0.5) +
+  scale_x_date(date_breaks = "3 weeks", date_labels = "%b %d") +
+  labs(x = NULL, y = "Fish loss") +
+  theme_bw() +
+  theme(
+    # make *all* text bold:
+    text         = element_text(face = "bold"),
+    # if you need to be extra-sure axis texts are bold:
+    axis.title   = element_text(face = "bold"),
+    axis.text    = element_text(face = "bold"),
+    strip.text   = element_text(face = "bold"),  # facet labels
+    legend.text  = element_text(face = "bold"),
+    legend.title = element_text(face = "bold"),
+    # keep the slanted x-labels
+    axis.text.x  = element_text(angle = 45, hjust = 1, face = "bold"),
+    legend.position = "bottom"
+  )
+
+# print to screen
+print(p)
+
+# save high-res PNG for Word
+ggsave("Salmonids/output/loss_plot.png", plot = p,
+       width  = 8,    # inches
+       height = 5,    # inches
+       dpi    = 300)  # sufficient for print/Word
+
+# Steelhead plot
+sh_data <- combined_weekly %>% filter(species == "Steelhead")
+
+p_sh <- ggplot(sh_data) +
+  geom_line(aes(x = Date, y = sum_7D_loss), size = 1) +
+  geom_line(aes(x = Date, y = threshold),
+            linetype = "dotted", size = 1) +
+  #geom_hline(aes(yintercept = 120), color = "red", linetype = "dotted", size = 1) +
+  #scale_color_viridis_d(name = "", begin = 0.1, end = 0.5) +
+  scale_x_date(date_breaks = "3 weeks", date_labels = "%b %d") +
+  labs(title = NULL, x = NULL, y = "# Steelhead") +
+  theme_bw(base_size = 14) +
+  theme(
+    text         = element_text(face = "bold"),
+    axis.text.x  = element_text(angle = 45, hjust = 1, face = "bold"),
+    strip.text   = element_blank(),
+    legend.position = "bottom"
+  )
+
+# Winter-run plot
+wr_data <- combined_weekly %>% filter(species == "Winter-run")
+
+p_wr <- ggplot(wr_data) +
+  geom_line(aes(x = Date, y = sum_7D_loss), size = 1) +
+  geom_line(aes(x = Date, y = threshold),
+            linetype = "dotted", size = 1) +
+  #scale_color_viridis_d(name = "", begin = 0.1, end = 0.5) +
+  scale_x_date(date_breaks = "3 weeks", date_labels = "%b %d") +
+  labs(title = NULL, x = NULL, y = "# Salmon") +
+  theme_bw(base_size = 14) +
+  theme(
+    text         = element_text(face = "bold"),
+    axis.text.x  = element_text(angle = 45, hjust = 1, face = "bold"),
+    strip.text   = element_blank(),
+    legend.position = "bottom"
+  )
+
+# Print to screen if you like
+print(p_sh)
+print(p_wr)
+
+# Save each out as a high-res PNG for Word
+ggsave("Salmonids/output/steelhead_weekly_loss.png", p_sh,
+       width = 8, height = 5, dpi = 300)
+ggsave("Salmonids/output/winterrun_weekly_loss.png", p_wr,
+       width = 8, height = 5, dpi = 300)
+
+# 1) Filter for LSNFH hatchery fish and extract date ----------------------------
+wr_hatch <- wr_loss %>%
+  filter(cwt_hatch == "LSNFH") %>%        # keep only LSNFH releases
+  mutate(date = as.Date(sample_time)) %>% # convert datetime → Date
+  select(date)
+
+# 2) Tally daily losses & fill in zeros ----------------------------------------
+daily_hatch <- wr_hatch %>%
+  count(date, name = "daily_loss") %>%    # one row per date with n fish lost
+  complete(date = seq(min(date), max(date), by = "day"),
+           fill = list(daily_loss = 0)) %>%
+  arrange(date)
+
+# --- 1. Compute your threshold values --------------------------------
+thr100 <- jpe * 0.005
+thr75  <- thr100 * 0.75
+thr50  <- thr100 * 0.50
+
+threshold_lines <- tibble(
+  pct   = c("100 %", "75 %", "50 %"),
+  value = c(thr100, thr75, thr50)
+)
+
+# --- 2. Prepare your LSNFH‐only daily cumulative series --------------
+daily_hatch <- wr_loss %>%
+  filter(cwt_hatch == "LSNFH") %>%
+  mutate(date = as.Date(sample_time)) %>%
+  count(date, name = "daily_loss") %>%
+  complete(date = seq(min(date), max(date), by = "day"),
+           fill = list(daily_loss = 0)) %>%
+  arrange(date) %>%
+  mutate(cumul_loss = cumsum(daily_loss))
+
+# compute the date limits from your data
+date_limits <- range(daily_hatch$date)
+
+# --- 3. Plot with three hlines ----------------------------------------
+p_hatch3 <- ggplot(daily_hatch, aes(x = date, y = cumul_loss)) +
+  geom_line(size = 1.2) +
+  geom_hline(data = threshold_lines,
+             aes(yintercept = value, linetype = pct), size = 1) +
+  scale_linetype_manual(
+    name   = "% Threshold",
+    values = c("100 %" = "dashed",
+               "75 %"  = "dotted",
+               "50 %"  = "dotdash")
+  ) +
+  scale_x_date(
+    limits     = date_limits,
+    date_breaks = "1 day",        # one tick every 7 days
+    date_labels = "%b %d",         # e.g. “Mar 17”
+    expand      = expansion(add = c(0, 0))
+  ) +
+  labs(
+    title = NULL,
+    x     = NULL,
+    y     = "# Salmon"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    text            = element_text(face = "bold"),
+    axis.text.x     = element_text(angle = 45, hjust = 1, face = "bold"),
+    plot.title      = element_text(size = 16),
+    legend.position = "bottom"
+  )
+
+print(p_hatch3)
+
+# --- 4. Save for Word import ------------------------------------------
+ggsave("Salmonids/output/wr_hatch_cumul_loss_pct_lines.png",
+       plot = p_hatch3,
+       width  = 8, height = 5, dpi = 300)
+
+p_hatch3b <- ggplot(daily_hatch, aes(x = date)) +
+  # 1) daily loss as light grey bars
+  geom_col(aes(y = daily_loss),
+           fill  = "grey40",
+           width = 1,
+           alpha = 0.6) +
+  
+  # 2) cumulative loss line
+  geom_line(aes(y = cumul_loss),
+            size  = 1.2) +
+  
+  # 3) percent‐of‐JPE thresholds
+  geom_hline(data = threshold_lines,
+             aes(yintercept = value, linetype = pct),
+             size = 1) +
+  scale_linetype_manual(
+    name   = "% Threshold",
+    values = c("100 %" = "dashed",
+               "75 %"  = "dotted",
+               "50 %"  = "dotdash")
+  ) +
+  
+  # 4) x‐axis ticks
+  scale_x_date(
+    limits      = date_limits,
+    date_breaks = "2 days",
+    date_labels = "%b %d",
+    expand      = expansion(add = c(0, 0))
+  ) +
+  
+  labs(
+    x = NULL,
+    y = "# Salmon"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    text           = element_text(face = "bold"),
+    axis.text.x    = element_text(angle = 45, hjust = 1, face = "bold"),
+    legend.position = "bottom"
+  )
+
+print(p_hatch3b)
+
+# And save for your Word doc:
+ggsave("Salmonids/output/wr_hatch_daily_and_cumul.png",
+       plot = p_hatch3b,
+       width  = 8, height = 5, dpi = 300)
+
+# 1. Set up Steelhead annual thresholds ----------------------------------------
+sh_thr100 <- 3000
+sh_thr75  <- sh_thr100 * 0.75
+sh_thr50  <- sh_thr100 * 0.50
+
+sh_thresh_lines <- tibble(
+  pct   = c("100 %", "75 %",   "50 %"),
+  value = c(sh_thr100, sh_thr75, sh_thr50)
+)
+
+# 2. Build the daily + cumulative series --------------------------------------
+steel_daily <- sh_loss %>%
+  # make sure your date column is Date class
+  mutate(date = as.Date(date)) %>%
+  # daily total loss (in case you had multiple entries per day)
+  group_by(date) %>%
+  summarise(daily_loss = sum(loss, na.rm = TRUE), .groups = "drop") %>%
+  # fill in any missing dates with zeros
+  complete(date = seq(min(date), max(date), by = "day"),
+           fill = list(daily_loss = 0)) %>%
+  arrange(date) %>%
+  # running total
+  mutate(cumul_loss = cumsum(daily_loss))
+
+# 3. Plot with three percent‐lines --------------------------------------------
+p_sh <- ggplot(steel_daily, aes(x = date, y = cumul_loss)) +
+  # main cumulative‐loss line
+  geom_line(size = 1.2) +
+  
+  # percent‐of‐annual hlines
+  geom_hline(data = sh_thresh_lines,
+             aes(yintercept = value, linetype = pct),
+             size = 1) +
+  
+  scale_linetype_manual(
+    name   = "% Threshold",
+    values = c("100 %" = "dashed",
+               "75 %"  = "dotted",
+               "50 %"  = "dotdash")
+  ) +
+  
+  # weekly ticks on x‐axis
+  scale_x_date(
+    date_breaks = "1 week",
+    date_labels = "%b %d",
+    expand      = expansion(add = c(0, 0))
+  ) +
+  
+  labs(
+    title    = NULL,
+    subtitle = NULL,
+    x        = NULL,
+    y        = "# Steelhead"
+  ) +
+  
+  theme_bw(base_size = 14) +
+  theme(
+    text            = element_text(face = "bold"),
+    axis.text.x     = element_text(angle = 45, hjust = 1, face = "bold"),
+    plot.title      = element_text(size = 16),
+    plot.subtitle   = element_text(size = 12, face = "italic"),
+    legend.position = "bottom"
+  )
+
+print(p_sh)
+
+# 4. Save high-res PNG for Word import ----------------------------------------
+ggsave("Salmonids/output/steelhead_cumul_loss.png",
+       plot = p_sh,
+       width  = 8,   # inches
+       height = 5,   # inches
+       dpi    = 300)
+
+p_sh2 <- ggplot(steel_daily, aes(x = date)) +
+  # daily loss as grey bars
+  geom_col(aes(y = daily_loss),
+           fill   = "grey40",
+           width  = 1,
+           alpha  = 0.6) +
+  # cumulative‐loss line on top
+  geom_line(aes(y = cumul_loss),
+            size   = 1.2) +
+  # percent‐of‐annual hlines
+  geom_hline(data = sh_thresh_lines,
+             aes(yintercept = value, linetype = pct),
+             size = 1) +
+  scale_linetype_manual(
+    name   = "% Threshold",
+    values = c("100 %" = "dashed",
+               "75 %"  = "dotted",
+               "50 %"  = "dotdash")
+  ) +
+  # weekly x‐axis ticks
+  scale_x_date(
+    date_breaks = "1 week",
+    date_labels = "%b %d",
+    expand      = expansion(add = c(0, 0))
+  ) +
+  labs(
+    y = "# Steelhead",
+    x = NULL
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    text            = element_text(face = "bold"),
+    axis.text.x     = element_text(angle = 45, hjust = 1, face = "bold"),
+    legend.position = "bottom"
+  )
+
+print(p_sh2)
+
+# Save if you like
+ggsave("Salmonids/output/steelhead_daily_and_cumul_loss.png",
+       plot = p_sh2,
+       width  = 8, height = 5, dpi = 300)
 
 ###########################
 #historical loss comparison
