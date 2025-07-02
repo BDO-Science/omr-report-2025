@@ -132,3 +132,24 @@ sh_by_month <- sh_import_all_years %>%
   mutate(month = factor(month, levels = c('Jul', 'Aug', 'Sep', 'Oct', 'Nov', 
                                           'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 
                                           'May', 'Jun')))
+
+
+######################
+#spring-run surrogates
+######################
+
+#######scrapping SacPAS surrogate stuff
+library(rvest)
+library(janitor)
+
+hatcheryurl <- 'https://www.cbr.washington.edu/sacramento/data/delta_cwt_tables.html'
+webpage <- read_html(hatcheryurl)
+tables <- webpage %>%
+  html_nodes("table")
+
+surrogates <- html_table(tables[[6]]) %>% 
+  row_to_names(row_number = 1) %>%
+  filter(`Release Type` == 'Experimental') %>%
+  select(1,3:12)
+
+write.csv(surrogates, file = 'Salmonids/output/SRsurrogates.csv', row.names = FALSE)
