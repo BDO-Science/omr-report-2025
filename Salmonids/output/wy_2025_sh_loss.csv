@@ -118,7 +118,11 @@
 "2025-05-26 06:00:00","CVP","Rainbow / Steelhead Trout","Unclipped",30,120,0.25,"Normal count",332,1,4,2.72,1942758,-2144
 "Notes:",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 "Loss and Salvage Detail",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+<<<<<<< HEAD
 "Generated 03 Jul 2025 11:10:27 PDT.",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+=======
+"Generated 03 Jul 2025 11:14:14 PDT.",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+>>>>>>> 0afd5929e6bf8c0308f2dca15b08afd353d5c273
 "Data Courtesy of California Department of Fish and Wildlife.",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 "<a href='/sacramento/data/metadata/metadata_salvageloss.html'>Salvage and Loss at Delta Fish Facilities Metadata</a>",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 "Data column availability is linked to species, adipose fin clip status, and water year.",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
