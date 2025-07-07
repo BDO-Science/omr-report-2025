@@ -66,8 +66,14 @@ wr_thresholds <- read_csv('Salmonids/data/weeklyThresholds.csv') %>% #pulling in
 
 wr_weekly <- data.frame(date = seq(as.Date('2024-12-01'), as.Date('2025-06-30'), 1)) %>%
   left_join(wr_natural, by = 'date') %>%
+  select(-3) %>%
+  bind_rows(data.frame(date = as.Date('2025-03-19'), loss = 17.12)) %>%
+  group_by(date) %>%
+  summarize(loss = sum(loss)) %>%
+  ungroup() %>%
   left_join(wr_thresholds, by = 'date') %>%
   replace(is.na(.), 0) %>%
+  arrange(date) %>%
   mutate(threshold = round(threshold, 2)) %>%
   mutate(sum_7D_loss = rollsum(loss, k = 7, fill = NA, align = 'right')) %>%
   filter(date >= as.Date(paste0(wy,'-01-01')))
@@ -187,6 +193,10 @@ p_wr <- ggplot(wr_data) +
   geom_line(aes(x = Date, y = sum_7D_loss), size = 1) +
   geom_line(aes(x = Date, y = threshold),
             linetype = "dotted", size = 1) +
+  annotate(geom = 'point', x = as.Date('2025-03-19'), y = 30.12,
+           shape = 4, size = 4, color = 'red', stroke = 2) +
+  annotate(geom = 'point', x = as.Date('2025-03-25'), y = 22.6,
+           shape = 4, size = 4, color = 'red', stroke = 2) +
   #scale_color_viridis_d(name = "", begin = 0.1, end = 0.5) +
   scale_x_date(
     limits      = c(start_date, end_date),
@@ -194,7 +204,7 @@ p_wr <- ggplot(wr_data) +
     date_labels = "%b %d",
     expand      = expansion(add = c(0,0))
   ) +
-  labs(title = NULL, x = NULL, y = "# Salmon") +
+  labs(title = NULL, x = NULL, y = "Estimated Loss (# of Salmon)") +
   theme_bw(base_size = 14) +
   theme(
     text         = element_text(face = "bold"),
@@ -202,7 +212,7 @@ p_wr <- ggplot(wr_data) +
     strip.text   = element_blank(),
     legend.position = "bottom"
   )
-
+p_wr
 # Print to screen if you like
 print(p_sh)
 print(p_wr)
@@ -576,10 +586,9 @@ tables <- webpage %>%
   html_nodes("table")
 
 surrogates <- html_table(tables[[1]]) %>%
-  select(1,3:12) %>%
-  select(-7,-10,-11) %>%
   mutate('Percent of Threshold' = 
-           paste0(round(`Confirmed Loss`/`Loss Threshold (0.25% of CWT Released)` * 100,1), "%"))
+           paste0(round(`Confirmed Loss`/`Loss Threshold (0.25% of CWT Released)` * 100,1), "%")) %>%
+  select('Release Date' = 3,1,5,2,6,7,9,10,15,12,13)
 
 write.csv(filter(surrogates, Type == 'Yearling'), file = 'Salmonids/output/SR_yearling_surrogates.csv', row.names = FALSE)
 write.csv(filter(surrogates, Type != 'Yearling'), file = 'Salmonids/output/SR_yoy_surrogates.csv', row.names = FALSE)
