@@ -66,8 +66,14 @@ wr_thresholds <- read_csv('Salmonids/data/weeklyThresholds.csv') %>% #pulling in
 
 wr_weekly <- data.frame(date = seq(as.Date('2024-12-01'), as.Date('2025-06-30'), 1)) %>%
   left_join(wr_natural, by = 'date') %>%
+  select(-3) %>%
+  bind_rows(data.frame(date = as.Date('2025-03-19'), loss = 17.12)) %>%
+  group_by(date) %>%
+  summarize(loss = sum(loss)) %>%
+  ungroup() %>%
   left_join(wr_thresholds, by = 'date') %>%
   replace(is.na(.), 0) %>%
+  arrange(date) %>%
   mutate(threshold = round(threshold, 2)) %>%
   mutate(sum_7D_loss = rollsum(loss, k = 7, fill = NA, align = 'right')) %>%
   filter(date >= as.Date(paste0(wy,'-01-01')))
@@ -187,6 +193,10 @@ p_wr <- ggplot(wr_data) +
   geom_line(aes(x = Date, y = sum_7D_loss), size = 1) +
   geom_line(aes(x = Date, y = threshold),
             linetype = "dotted", size = 1) +
+  annotate(geom = 'point', x = as.Date('2025-03-19'), y = 30.12,
+           shape = 4, size = 4, color = 'red', stroke = 2) +
+  annotate(geom = 'point', x = as.Date('2025-03-25'), y = 22.6,
+           shape = 4, size = 4, color = 'red', stroke = 2) +
   #scale_color_viridis_d(name = "", begin = 0.1, end = 0.5) +
   scale_x_date(
     limits      = c(start_date, end_date),
@@ -194,7 +204,7 @@ p_wr <- ggplot(wr_data) +
     date_labels = "%b %d",
     expand      = expansion(add = c(0,0))
   ) +
-  labs(title = NULL, x = NULL, y = "Estimated Loss") +
+  labs(title = NULL, x = NULL, y = "Estimated Loss (# of Salmon)") +
   theme_bw(base_size = 14) +
   theme(
     text         = element_text(face = "bold"),
@@ -202,7 +212,7 @@ p_wr <- ggplot(wr_data) +
     strip.text   = element_blank(),
     legend.position = "bottom"
   )
-
+p_wr
 # Print to screen if you like
 print(p_sh)
 print(p_wr)
@@ -518,7 +528,7 @@ wr_temp <- wr_loss %>%
   mutate(month = month(date, label = TRUE)) %>%
   group_by(month) %>%
   summarize(n = sum(n)) %>%
-  mutate(class = 'current')
+  mutate(class = 'WY 2025')
 
 wr_by_month <- bind_rows(CVP, SWP) %>%
   mutate(month = month(SampleDateTime, label = TRUE),
@@ -527,19 +537,34 @@ wr_by_month <- bind_rows(CVP, SWP) %>%
   group_by(month) %>%
   summarize(n = n()) %>%
   ungroup() %>%
-  mutate(class = 'historic') %>%
+  mutate(class = 'Historic (2011-2024)') %>%
   bind_rows(wr_temp) %>%
-  filter(month %in% c('Jan', 'Feb', 'Mar', 'Apr', 'May')) %>%
+  filter(month %in% c('Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May')) %>%
+  mutate(month = factor(month, levels = c('Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'))) %>%
   group_by(class) %>%
   mutate(prop = prop.table(n))
 
+wr_month_graph <- wr_by_month %>%
+  ggplot(aes(x = month, y = prop*100, fill = class)) +
+  geom_col(color = 'black', position = 'dodge') +
+  scale_fill_viridis_d() +
+  labs(y='Percent of Loss') +
+  theme_bw(base_size = 14) +
+  theme(
+    text            = element_text(face = "bold"),
+    axis.text.x     = element_text(angle = 45, hjust = 1, face = "bold"),
+    legend.position = "bottom",
+    axis.title.x = element_blank(),
+    legend.title = element_blank()
+  )
+wr_month_graph
 ###historic steelhead
 sh_import_all_years <- read_csv('https://www.cbr.washington.edu/sacramento/data/php/rpt/juv_loss_detail.php?sc=1&outputFormat=csv&year=all&species=2%3Af&dnaOnly=no&age=no') %>%
   clean_names()
 
 sh_by_month <- sh_import_all_years %>%
   mutate(date = as.Date(sample_time)) %>%
-  mutate(class = if_else(date >= as.Date('2024-07-01'), 'current', 'historic'),
+  mutate(class = if_else(date >= as.Date('2024-07-01'), 'WY 2025', 'Historic (2009-2024)'),
          month = month(date, label = TRUE),
          wy = get_fy(date, opt_fy_start = '07-01')) %>%
   filter(wy > 2008) %>%
@@ -552,8 +577,23 @@ sh_by_month <- sh_import_all_years %>%
   mutate(month = factor(month, levels = c('Jul', 'Aug', 'Sep', 'Oct', 'Nov', 
                                           'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 
                                           'May', 'Jun')))
+sh_month_graph <- sh_by_month %>%
+  ggplot(aes(x = month, y = prop*100, fill = class)) +
+  geom_col(color = 'black', position = 'dodge') +
+  scale_fill_viridis_d() +
+  labs(y='Percent of Loss') +
+  theme_bw(base_size = 14) +
+  theme(
+    text            = element_text(face = "bold"),
+    axis.text.x     = element_text(angle = 45, hjust = 1, face = "bold"),
+    legend.position = "bottom",
+    axis.title.x = element_blank(),
+    legend.title = element_blank()
+  )
+sh_month_graph
 
-
+ggsave(sh_month_graph, file = 'Salmonids/output/sh_loss_by_month.png', width = 8, height = 5)
+ggsave(wr_month_graph, file = 'Salmonids/output/wr_loss_by_month.png', width = 8, height = 5)
 ######################
 #spring-run surrogates
 ######################
@@ -562,14 +602,15 @@ sh_by_month <- sh_import_all_years %>%
 library(rvest)
 library(janitor)
 
-hatcheryurl <- 'https://www.cbr.washington.edu/sacramento/data/delta_cwt_tables.html'
+hatcheryurl <- 'https://www.cbr.washington.edu/sacramento/workgroups/include_gen/WY2025/cwt_spring_surrogates.html'
 webpage <- read_html(hatcheryurl)
 tables <- webpage %>%
   html_nodes("table")
 
-surrogates <- html_table(tables[[6]]) %>% 
-  row_to_names(row_number = 1) %>%
-  filter(`Release Type` == 'Experimental') %>%
-  select(1,3:12)
+surrogates <- html_table(tables[[1]]) %>%
+  mutate('Percent of Threshold' = 
+           paste0(round(`Confirmed Loss`/`Loss Threshold (0.25% of CWT Released)` * 100,1), "%")) %>%
+  select('Release Date' = 3,1,5,2,6,7,9,10,15,12,13)
 
-write.csv(surrogates, file = 'Salmonids/output/SRsurrogates.csv', row.names = FALSE)
+write.csv(filter(surrogates, Type == 'Yearling'), file = 'Salmonids/output/SR_yearling_surrogates.csv', row.names = FALSE)
+write.csv(filter(surrogates, Type != 'Yearling'), file = 'Salmonids/output/SR_yoy_surrogates.csv', row.names = FALSE)
