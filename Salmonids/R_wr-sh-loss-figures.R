@@ -280,13 +280,22 @@ daily_natural <- wr_loss %>%
     daily_loss = sum(loss, na.rm = TRUE),     # sum your loss estimates
     .groups    = "drop"
   ) %>%
-  complete(
-    date       = seq(start_date, end_date, by = "day"),
-    fill       = list(daily_loss = 0)
-  ) %>%
+  #complete(
+    #date       = seq(start_date, end_date, by = "day"),
+    #fill       = list(daily_loss = 0)
+  #) %>%
   arrange(date) %>%
   mutate(
     cumul_loss = cumsum(daily_loss)           # cumulative series
+  )
+
+max_thresh <- max(threshold_lines$value)
+max_flow   <- max(fpt_q$parameter_value, na.rm = TRUE)
+
+fpt_q3 <- fpt_q %>%
+  mutate(
+    date        = as.Date(datetime),
+    flow_scaled = parameter_value * max_thresh / max_flow
   )
 
 # --- 2. Plot Natural‐origin loss + flow + thresholds ----------------------
@@ -295,10 +304,10 @@ p_nat <- ggplot(daily_natural, aes(x = date)) +
   geom_col(aes(y = daily_loss),
            fill  = "grey40",
            width = 1,
-           alpha = 0.6) +
+           alpha = 1) +
   # flow (scaled) line
   geom_line(
-    data = fpt_q2,
+    data = fpt_q3,
     aes(x = date, y = flow_scaled),
     color     = "grey80",
     linetype  = "twodash",
