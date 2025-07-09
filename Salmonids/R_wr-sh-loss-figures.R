@@ -162,7 +162,7 @@ ggsave("Salmonids/output/loss_plot.png", plot = p,
        height = 5,    # inches
        dpi    = 300)  # sufficient for print/Word
 
-# Steelhead plot
+#Estimated Loss plot
 sh_data <- combined_weekly %>% filter(species == "Steelhead")
 
 p_sh <- ggplot(sh_data) +
@@ -177,7 +177,7 @@ p_sh <- ggplot(sh_data) +
     date_labels = "%b %d",
     expand      = expansion(add = c(0,0))
   ) +
-  labs(title = NULL, x = NULL, y = "# Steelhead") +
+  labs(title = NULL, x = NULL, y = "Estimated Loss (# Steelhead)") +
   theme_bw(base_size = 14) +
   theme(
     text         = element_text(face = "bold"),
@@ -229,12 +229,7 @@ wr_hatch <- wr_loss %>%
   mutate(date = as.Date(sample_time)) %>% # convert datetime → Date
   select(date)
 
-# 2) Tally daily losses & fill in zeros ----------------------------------------
-daily_hatch <- wr_hatch %>%
-  count(date, name = "daily_loss") %>%    # one row per date with n fish lost
-  complete(date = seq(min(date), max(date), by = "day"),
-           fill = list(daily_loss = 0)) %>%
-  arrange(date)
+
 
 # --- 1. Compute your threshold values --------------------------------
 thr100 <- jpe * 0.005
@@ -248,31 +243,72 @@ threshold_lines <- tibble(
 
 # --- 2. Prepare your LSNFH‐only daily cumulative series --------------
 daily_hatch <- wr_loss %>%
-  filter(cwt_hatch == "LSNFH") %>%
-  mutate(date = as.Date(sample_time)) %>%
-  count(date, name = "daily_loss") %>%
-  complete(date = seq(min(date), max(date), by = "day"),
-           fill = list(daily_loss = 0)) %>%
+  filter(cwt_hatch == "LSNFH") %>%        # keep only LSNFH releases
+  mutate(date = as.Date(sample_time)) %>% # extract the Date
+  group_by(date) %>%
+  summarise(
+    daily_loss = sum(loss, na.rm = TRUE), # sum your “loss” estimates
+    .groups    = "drop"
+  ) %>%
+  complete(
+    date       = seq(min(date), max(date), by = "day"),
+    fill       = list(daily_loss = 0)
+  ) %>%
   arrange(date) %>%
-  mutate(cumul_loss = cumsum(daily_loss))
+  mutate(
+    cumul_loss = cumsum(daily_loss)       # rebuild your cumulative series
+  )
 
 # compute the date limits from your data
 date_limits <- range(daily_hatch$date)
 
 fpt_q <- cdec_query('FPT', '20', 'H', '2025-01-01')
 
-p_hatch3b <- ggplot(daily_hatch, aes(x = date)) +
-  # 1) daily loss as light grey bars
+
+
+# And save for your Word doc:
+ggsave("Salmonids/output/wr_hatch_daily_and_cumul.png",
+       plot = p_hatch3b,
+       width  = 8, height = 5, dpi = 300)
+
+# --- 1. Prepare your Natural‐origin daily cumulative series --------------
+daily_natural <- wr_loss %>%
+  filter(adipose_clip == "Unclipped", dna_race == "Winter") %>% 
+  mutate(date = as.Date(sample_time)) %>%     # extract date
+  group_by(date) %>%
+  summarise(
+    daily_loss = sum(loss, na.rm = TRUE),     # sum your loss estimates
+    .groups    = "drop"
+  ) %>%
+  complete(
+    date       = seq(start_date, end_date, by = "day"),
+    fill       = list(daily_loss = 0)
+  ) %>%
+  arrange(date) %>%
+  mutate(
+    cumul_loss = cumsum(daily_loss)           # cumulative series
+  )
+
+# --- 2. Plot Natural‐origin loss + flow + thresholds ----------------------
+p_nat <- ggplot(daily_natural, aes(x = date)) +
+  # daily loss bars
   geom_col(aes(y = daily_loss),
            fill  = "grey40",
            width = 1,
            alpha = 0.6) +
-  geom_line(data = fpt_q, x=) +
-  # 2) cumulative loss line
+  # flow (scaled) line
+  geom_line(
+    data = fpt_q2,
+    aes(x = date, y = flow_scaled),
+    color     = "grey80",
+    linetype  = "twodash",
+    size      = 1
+  ) +
+  # cumulative loss
   geom_line(aes(y = cumul_loss),
-            size  = 1.2) +
-  
-  # 3) percent‐of‐JPE thresholds
+            size  = 1.2,
+            color = "black") +
+  # percent‐of‐JPE threshold lines
   geom_hline(data = threshold_lines,
              aes(yintercept = value, linetype = pct),
              size = 1) +
@@ -282,85 +318,121 @@ p_hatch3b <- ggplot(daily_hatch, aes(x = date)) +
                "75 %"  = "dotted",
                "50 %"  = "dotdash")
   ) +
-  
-  # 4) x‐axis ticks
-  scale_x_date(
-    limits      = c(start_date, end_date),
-    date_breaks = "2 weeks",        # one tick every 7 days
-    date_labels = "%b %d",
-    expand      = expansion(add = c(0, 0))
-  ) +
-  
-  labs(
-    x = NULL,
-    y = "# Salmon"
-  ) +
-  theme_bw(base_size = 14) +
-  theme(
-    text           = element_text(face = "bold"),
-    axis.text.x    = element_text(angle = 45, hjust = 1, face = "bold"),
-    legend.position = "bottom"
-  )
-
-print(p_hatch3b)
-
-# And save for your Word doc:
-ggsave("Salmonids/output/wr_hatch_daily_and_cumul.png",
-       plot = p_hatch3b,
-       width  = 8, height = 5, dpi = 300)
-
-fpt_q2 <- fpt_q %>%
-  mutate(
-    date        = as.Date(datetime),
-    # scale so that max(flow_scaled) == max_thresh
-    flow_scaled = parameter_value * max_thresh / max_flow
-  )
-
-# 0) re-compute your maxima
-max_loss     <- max(daily_hatch$cumul_loss,      na.rm=TRUE)
-max_thresh   <- max(threshold_lines$value)        # thr100,75,50
-max_flow     <- max(fpt_q$parameter_value,       na.rm=TRUE)
-
-upper_y      <- max(max_loss, max_thresh) * 1.05
-
-# 1) rebuild the plot, swapping in the new limits
-p_hatch <- ggplot(daily_hatch, aes(x = date)) +
-  # bars + cum-loss + FPT flow (same as before) …
-  geom_col(aes(y = daily_loss), fill="grey40", width=1, alpha=0.6) +
-  geom_line(aes(y = cumul_loss), size=1.2) +
-  geom_line(data = fpt_q2,
-            aes(x = date, y = flow_scaled),
-            size=1, color="grey80", linetype="twodash") +
-  
-  # your three %-of-JPE hlines
-  geom_hline(data = threshold_lines,
-             aes(yintercept = value, linetype = pct),
-             size = 1) +
-  scale_linetype_manual(
-    name   = "% Threshold",
-    values = c("100 %"="dashed", "75 %"="dotted", "50 %"="dotdash")
-  ) +
-  
-  # *** new y-scale limits ***
-  scale_y_continuous(
-    name     = "# Salmon",
-    limits   = c(0, max_thresh * 1.05),
-    sec.axis = sec_axis(~ . * (max_flow / max_thresh),
-                        name = "Flow (cfs)")
-  ) +
-  
+  # x‐axis from Oct 1 – Jun 30, 2‐week ticks
   scale_x_date(
     limits      = c(start_date, end_date),
     date_breaks = "2 weeks",
     date_labels = "%b %d",
     expand      = expansion(add = c(0, 0))
   ) +
-  labs(x = NULL) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
   theme_bw(base_size = 14) +
   theme(
     text           = element_text(face = "bold"),
     axis.text.x    = element_text(angle = 45, hjust = 1, face = "bold"),
     legend.position = "bottom"
+  ) + 
+  scale_y_continuous(
+    name     = "Estimated Loss (# Salmon)",
+    limits   = c(0, max_thresh * 1.05),
+    sec.axis = sec_axis(
+      ~ . * (max_flow / max_thresh),
+      name = "Flow (cfs)"
+    )
+  )
+
+print(p_nat)
+
+# --- 3. Save for Word import --------------------------------------------
+ggsave("Salmonids/output/wr_natural_daily_and_cumul.png",
+       plot = p_nat,
+       width  = 8,
+       height = 5,
+       dpi    = 300)
+
+# 0) re-compute your maxima
+upper_y      <- max(max_loss, max_thresh) * 1.5
+
+# 1) Compute hatchery thresholds (100%, 75%, 50%)
+h_thr100 <- jpe_hatch * 0.0012
+h_thr75  <- h_thr100  * 0.75
+h_thr50  <- h_thr100  * 0.50
+
+threshold_lines_hatch <- tibble(
+  pct   = c("100 %", "75 %", "50 %"),
+  value = c(h_thr100, h_thr75, h_thr50)
+)
+
+# recompute your maxima if you haven’t already
+max_thresh <- max(threshold_lines_hatch$value)
+max_flow   <- max(fpt_q$parameter_value, na.rm = TRUE)
+
+# re‐scale your flow so it still fits under the hatch threshold
+fpt_q2 <- fpt_q %>%
+  mutate(
+    date        = as.Date(datetime),
+    flow_scaled = parameter_value * max_thresh / max_flow
+  )
+
+# 1) rebuild the plot, swapping in the new limits
+p_hatch <- ggplot(daily_hatch, aes(x = date)) +
+  # 1) daily loss as light grey bars
+  geom_col(aes(y = daily_loss),
+           fill  = "grey40",
+           width = 1,
+           alpha = 0.6) +
+  
+  # 1b) flow line, scaled to your thresholds
+  geom_line(
+    data = fpt_q2,
+    aes(x = date, y = flow_scaled),
+    color     = "grey80",
+    linetype  = "twodash",
+    size      = 1
+  ) +
+  
+  # 2) cumulative loss line
+  geom_line(aes(y = cumul_loss),
+            size  = 1.2,
+            color = "black") +
+  
+  # ← use the new hatchery thresholds
+  geom_hline(data = threshold_lines_hatch,
+             aes(yintercept = value, linetype = pct),
+             size = 1) +
+  scale_linetype_manual(
+    name   = "% of Hatchery Threshold",
+    values = c("100 %"="dashed","75 %"="dotted","50 %"="dotdash")
+  ) +
+  
+  # 4) x‐axis ticks
+  scale_x_date(
+    limits      = c(start_date, end_date),
+    date_breaks = "2 weeks",
+    date_labels = "%b %d",
+    expand      = expansion(add = c(0, 0))
+  ) +
+  
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    text           = element_text(face = "bold"),
+    axis.text.x    = element_text(angle = 45, hjust = 1, face = "bold"),
+    legend.position = "bottom"
+  ) + 
+  scale_y_continuous(
+    name     = "Estimated Loss (# Salmon)",
+    limits   = c(0, max_thresh * 1.5),
+    sec.axis = sec_axis(
+      ~ . * (max_flow / max_thresh),
+      name = "Flow (cfs)"
+    )
   )
 
 print(p_hatch)
@@ -394,56 +466,6 @@ steel_daily <- sh_loss %>%
   # running total
   mutate(cumul_loss = cumsum(daily_loss))
 
-# 3. Plot with three percent‐lines --------------------------------------------
-p_sh <- ggplot(steel_daily, aes(x = date, y = cumul_loss)) +
-  # main cumulative‐loss line
-  geom_line(size = 1.2) +
-  
-  # percent‐of‐annual hlines
-  geom_hline(data = sh_thresh_lines,
-             aes(yintercept = value, linetype = pct),
-             size = 1) +
-  
-  scale_linetype_manual(
-    name   = "% Threshold",
-    values = c("100 %" = "dashed",
-               "75 %"  = "dotted",
-               "50 %"  = "dotdash")
-  ) +
-  
-  # weekly ticks on x‐axis
-  scale_x_date(
-    limits      = c(start_date, end_date),
-    date_breaks = "2 weeks",        # one tick every 7 days
-    date_labels = "%b %d",
-    expand      = expansion(add = c(0, 0))
-  ) +
-  
-  labs(
-    title    = NULL,
-    subtitle = NULL,
-    x        = NULL,
-    y        = "# Steelhead"
-  ) +
-  
-  theme_bw(base_size = 14) +
-  theme(
-    text            = element_text(face = "bold"),
-    axis.text.x     = element_text(angle = 45, hjust = 1, face = "bold"),
-    plot.title      = element_text(size = 16),
-    plot.subtitle   = element_text(size = 12, face = "italic"),
-    legend.position = "bottom"
-  )
-
-print(p_sh)
-
-# 4. Save high-res PNG for Word import ----------------------------------------
-ggsave("Salmonids/output/steelhead_cumul_loss.png",
-       plot = p_sh,
-       width  = 8,   # inches
-       height = 5,   # inches
-       dpi    = 300)
-
 p_sh2 <- ggplot(steel_daily, aes(x = date)) +
   # daily loss as grey bars
   geom_col(aes(y = daily_loss),
@@ -471,7 +493,7 @@ p_sh2 <- ggplot(steel_daily, aes(x = date)) +
     expand      = expansion(add = c(0, 0))
   ) +
   labs(
-    y = "# Steelhead",
+    y = "Estimated Loss (# Steelhead)",
     x = NULL
   ) +
   theme_bw(base_size = 14) +
