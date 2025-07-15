@@ -8,7 +8,7 @@ library(janitor)
 # Salvage plot -------------------------------
 
 # Copied from Nicole's LFS code. Data adapted from Geir Aasen's (CDFW) salvage report: Copy of SMELT_SALVAGE_TABLES_2025_06232025_END_OF_YEAR_REPORT_
-salvage <- read_csv("C:/My Projects/SMT/OMR seasonal report/2025/Salvage_OMRI_2025.csv") %>%
+salvage <- read_csv(here::here("DeltaSmelt/data/Salvage_OMRI_2025.csv")) %>%
   clean_names() %>%
   mutate(date = mdy(date),
          federal_season_salvage_adult = as.numeric(federal_season_salvage_adult),
