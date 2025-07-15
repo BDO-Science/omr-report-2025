@@ -557,7 +557,7 @@ wr_month_graph <- wr_by_month %>%
   ggplot(aes(x = month, y = prop*100, fill = class)) +
   geom_col(color = 'black', position = 'dodge') +
   scale_fill_viridis_d() +
-  labs(y='Percent of Loss') +
+  labs(y='Percent of Observed Salvage') +
   theme_bw(base_size = 14) +
   theme(
     text            = element_text(face = "bold"),
