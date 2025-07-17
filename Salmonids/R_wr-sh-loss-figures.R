@@ -548,10 +548,13 @@ wr_by_month <- bind_rows(CVP, SWP) %>%
   ungroup() %>%
   mutate(class = 'Historic (2011-2024)') %>%
   bind_rows(wr_temp) %>%
-  filter(month %in% c('Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May')) %>%
-  mutate(month = factor(month, levels = c('Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'))) %>%
+  mutate(month = factor(month, levels = c('Jul', 'Aug', 'Sep', 'Oct', 'Nov', 
+                                   'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 
+                                   'May', 'Jun'))) %>%
   group_by(class) %>%
-  mutate(prop = prop.table(n))
+  mutate(prop = prop.table(n)) %>%
+  ungroup() %>%
+  complete(month, class, fill = list(prop = NA))
 
 wr_month_graph <- wr_by_month %>%
   ggplot(aes(x = month, y = prop*100, fill = class)) +
@@ -567,6 +570,43 @@ wr_month_graph <- wr_by_month %>%
     legend.title = element_blank()
   )
 wr_month_graph
+
+###hathcery wr by month
+wr_hatch_all_years <- read_csv('https://www.cbr.washington.edu/sacramento/data/php/rpt/juv_loss_detail.php?sc=1&outputFormat=csv&year=all&species=1%3At&dnaOnly=no&age=no') %>%
+  clean_names()
+
+wr_hatch_by_month <- wr_hatch_all_years %>%
+  mutate(date = as.Date(sample_time)) %>%
+  filter(cwt_race == 'Winter') %>%
+  mutate(class = if_else(date >= as.Date('2024-07-01'), 'WY 2025', 'Historic (1999-2024)'),
+         month = month(date, label = TRUE),
+         wy = get_fy(date, opt_fy_start = '07-01')) %>%
+  group_by(month, class) %>%
+  summarize(loss = sum(loss)) %>%
+  ungroup() %>%
+  na.omit() %>%
+  group_by(class) %>%
+  mutate(prop = prop.table(loss)) %>%
+  ungroup() %>%
+  mutate(month = factor(month, levels = c('Jul', 'Aug', 'Sep', 'Oct', 'Nov', 
+                                          'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 
+                                          'May', 'Jun'))) %>%
+  complete(month, class, fill = list(prop = NA))
+
+wr_hatch_month_graph <- wr_hatch_by_month %>%
+  ggplot(aes(x = month, y = prop*100, fill = class)) +
+  geom_col(color = 'black', position = 'dodge') +
+  scale_fill_viridis_d() +
+  labs(y='Percent of Loss') +
+  theme_bw(base_size = 14) +
+  theme(
+    text            = element_text(face = "bold"),
+    axis.text.x     = element_text(angle = 45, hjust = 1, face = "bold"),
+    legend.position = "bottom",
+    axis.title.x = element_blank(),
+    legend.title = element_blank()
+  )
+wr_hatch_month_graph
 ###historic steelhead
 sh_import_all_years <- read_csv('https://www.cbr.washington.edu/sacramento/data/php/rpt/juv_loss_detail.php?sc=1&outputFormat=csv&year=all&species=2%3Af&dnaOnly=no&age=no') %>%
   clean_names()
@@ -583,9 +623,11 @@ sh_by_month <- sh_import_all_years %>%
   na.omit() %>%
   group_by(class) %>%
   mutate(prop = prop.table(loss)) %>%
+  ungroup() %>%
   mutate(month = factor(month, levels = c('Jul', 'Aug', 'Sep', 'Oct', 'Nov', 
                                           'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 
-                                          'May', 'Jun')))
+                                          'May', 'Jun'))) %>%
+  complete(month, class, fill = list(prop = NA))
 sh_month_graph <- sh_by_month %>%
   ggplot(aes(x = month, y = prop*100, fill = class)) +
   geom_col(color = 'black', position = 'dodge') +
@@ -603,6 +645,7 @@ sh_month_graph
 
 ggsave(sh_month_graph, file = 'Salmonids/output/sh_loss_by_month.png', width = 8, height = 5)
 ggsave(wr_month_graph, file = 'Salmonids/output/wr_loss_by_month.png', width = 8, height = 5)
+ggsave(wr_hatch_month_graph, file = 'Salmonids/output/wr_hatch_loss_by_month.png', width = 8, height = 5)
 ######################
 #spring-run surrogates
 ######################
