@@ -151,18 +151,20 @@ dev.off()
 hatchery <- readxl::read_excel(here::here("Salmonids/data/HatcheryWinterRunSurvival.xlsx")) %>%
   mutate(BY = factor(BY),
          Metric_label = case_when(Metric == "Benicia" ~ "Minimum Survival to Benicia Bridge East Span (95% CI)",
-                            Metric == "Delta" ~ "Minimum Through-Delta Survival (95% CI)"))
+                            Metric == "Delta" ~ "Minimum Through-Delta Survival (95% CI)",
+                            Metric == 'Entry' ~ 'Minimum Survival to Delta Entry (95% CI'))
 
 ## Separate out data
 hatchery_benicia <- hatchery %>% filter(Metric == "Benicia")
 hatchery_delta <- hatchery %>% filter(Metric == "Delta")
+hatchery_entry <- hatchery %>% filter(Metric == 'Entry')
 
 ## Benicia Plot
 ben <- ggplot(data = hatchery_benicia) + 
   geom_point(aes(x = BY, y = Survival)) +
   geom_errorbar(aes(x = BY, ymin = `95LCI`, ymax = `95UCI`), width = 0.1)+
   geom_hline(aes(yintercept = mean(Survival)), linetype = "dashed", color = "maroon")+
-  labs(title = paste0("B) ",hatchery_benicia$Metric_label), x = "Brood Year", y  = "Survival (%)")+
+  labs(title = paste0("C) ",hatchery_benicia$Metric_label), x = "Brood Year", y  = "Survival (%)")+
   theme_bw() +
   theme(axis.text.x = element_text(size = 12),
         axis.title = element_text(size = 13),
@@ -173,7 +175,7 @@ delta <- ggplot(hatchery_delta) +
   geom_point(aes(BY, Survival)) +
   geom_errorbar(aes(x = BY, ymin = `95LCI`, ymax = `95UCI`), width = 0.1)+
   geom_hline(aes(yintercept = mean(Survival)), linetype = "dashed", color = "navy")+
-  labs(title = paste0("A) ", hatchery_delta$Metric_label), x = "Brood Year", y  = "Survival (%)")+
+  labs(title = paste0("B) ", hatchery_delta$Metric_label), x = "Brood Year", y  = "Survival (%)")+
   theme_bw() +
   theme(axis.text.x = element_text(size = 12),
         axis.title = element_text(size = 13),
@@ -181,12 +183,149 @@ delta <- ggplot(hatchery_delta) +
 mean(hatchery_benicia$Survival)
 mean(hatchery_delta$Survival)
 
+##
+entry <- ggplot(data = hatchery_entry) + 
+  geom_point(aes(x = BY, y = Survival)) +
+  geom_errorbar(aes(x = BY, ymin = `95LCI`, ymax = `95UCI`), width = 0.1)+
+  geom_hline(aes(yintercept = mean(Survival)), linetype = "dashed", color = "darkorange")+
+  labs(title = paste0("A) ",hatchery_entry$Metric_label), x = "Brood Year", y  = "Survival (%)")+
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 12),
+        axis.title = element_text(size = 13),
+        strip.text = element_text(size = 12))
+
 ## Combine plots
 library(patchwork) 
-(survival_plot <- delta / ben)
+(survival_plot <- entry/ delta / ben)
 
 ## Write plot
 tiff("Salmonids/appendix_outputs/Figure_wr_hatcherysurvival.tiff", width = 6, height =7, units = "in", res = 300, compression = "lzw")
 survival_plot
 dev.off()
 
+# Loss trends ---------------------------------------------
+## Majority of loss data queried from SacPAS.
+## Historic genetic WR loss dataset came from DWR
+## Read in data. Add Brood year as a variable to match other plots. 
+library(busdater)
+wday <- readRDS("salmonids/data/waterDay.rds")
+
+#genetic wr
+wr_loss_import <- read_csv('https://www.cbr.washington.edu/sacramento/data/php/rpt/juv_loss_detail.php?sc=1&outputFormat=csv&year=all&species=1%3Af&dnaOnly=yes&age=no') %>%
+  janitor::clean_names()
+
+wr_loss_2020_on <- wr_loss_import %>%
+  filter(dna_race == 'Winter') %>%
+  mutate(date = as.Date(sample_time)) %>%
+  mutate(wy = get_fy(date, opt_fy_start = '10-01')) %>%
+  group_by(date, wy) %>%
+  summarize(loss = sum(loss)) %>%
+  ungroup()
+
+wr_loss_pre_2020 <- read_csv("Salmonids/data/genetic_wr_loss_all.csv") %>%
+  mutate(date = mdy(`Sample Date`),
+         wy = WaterYear) %>%
+  group_by(date, wy) %>%
+  summarize(loss = sum(Loss)) %>%
+  ungroup() %>%
+  filter(wy < 2020)
+
+wr_loss_genetic <- bind_rows(wr_loss_2020_on, wr_loss_pre_2020) %>%
+  group_by(wy) %>%
+  mutate(cumul = cumsum(loss)) %>%
+  mutate(wday = wday(date))
+
+wr_loss_genetic_2025 <- wr_loss_genetic %>%
+  filter(wy == 2025)
+wr_loss_genetic_historic <- wr_loss_genetic %>%
+  filter(wy != 2025)
+max_loss <- max(wr_loss_genetic_2025$cumul)
+
+wr_loss_genetic_labels <- wr_loss_genetic %>%
+  group_by(wy) %>%
+  summarize(wday = max(wday),
+            cumul = max(cumul)) %>%
+  filter(cumul >= max_loss)
+
+wr_loss_anti_labels <- wr_loss_genetic %>%
+  group_by(wy) %>%
+  summarize(wday = max(wday),
+            cumul = max(cumul)) %>%
+  filter(cumul < max_loss) %>%
+  pull(wy)
+text_wys <- paste0("WYs with less total Loss:\n", toString(wr_loss_anti_labels))
+natural_spaghetti <- ggplot() +
+  geom_line(wr_loss_genetic_historic, mapping = aes(x = wday, y = cumul, group = factor(wy)), linewidth = 1,
+            color = 'grey', alpha = 0.5) +
+  geom_line(wr_loss_genetic_2025, mapping = aes(x = wday, y = cumul), linewidth = 1.5,
+            color = 'black') +
+  labs(x = 'Date', y = 'Cumulative Loss',
+       title = paste0("A) Genetic Winter-run Cumulative Loss")) +
+  geom_text(wr_loss_genetic_labels, mapping = aes(x = wday + 4, y = cumul+10, label = factor(wy)), size = 3) +
+  #annotate(geom = 'text', 90, y = 1400, label = text_wys) +
+  scale_x_continuous(breaks = c(61, 92, 123, 153, 183, 213),
+                     labels = c('Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May')) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.title.y = element_text(size = 13),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank())
+natural_spaghetti
+
+#hatchery wr
+wr_hatchery_import <- read_csv('https://www.cbr.washington.edu/sacramento/data/php/rpt/juv_loss_detail.php?sc=1&outputFormat=csv&year=all&species=1%3At&dnaOnly=no&age=no') %>%
+  janitor::clean_names()
+
+wr_hatchery_loss <- wr_hatchery_import %>%
+  filter(cwt_race == 'Winter') %>%
+  mutate(date = as.Date(sample_time)) %>%
+  mutate(wy = get_fy(date, opt_fy_start = '10-01')) %>%
+  group_by(date, wy) %>%
+  summarize(loss = sum(loss)) %>%
+  ungroup() %>%
+  group_by(wy) %>%
+  mutate(cumul = cumsum(loss),
+         wday = wday(date))
+  
+wr_loss_hatchery_2025 <- wr_hatchery_loss %>%
+  filter(wy == 2025)
+wr_loss_hatchery_historic <- wr_hatchery_loss %>%
+  filter(wy != 2025)
+max_loss_hatch <- max(wr_loss_hatchery_2025$cumul)
+wr_loss_hatchery_labels <- wr_hatchery_loss %>%
+  group_by(wy) %>%
+  summarize(wday = max(wday),
+            cumul = max(cumul)) %>%
+  filter(cumul >= max_loss_hatch)
+
+wr_hatch_loss_anti_labels <- wr_hatchery_loss %>%
+  group_by(wy) %>%
+  summarize(wday = max(wday),
+            cumul = max(cumul)) %>%
+  filter(cumul < max_loss_hatch) %>%
+  pull(wy)
+text_wys_hatch <- paste0("WYs with less total Loss:\n", toString(wr_hatch_loss_anti_labels))
+
+hatchery_spaghetti <- ggplot() +
+  geom_line(wr_loss_hatchery_historic, mapping = aes(x = wday, y = cumul, group = factor(wy)), linewidth = 1,
+            color = 'grey', alpha = 0.5) +
+  geom_line(wr_loss_hatchery_2025, mapping = aes(x = wday, y = cumul), linewidth = 1.5,
+            color = 'black') +
+  labs(x = 'Date', y = 'Cumulative Loss',
+       title = paste0("B) Hatchery Winter-run Cumulative Loss")) +
+  geom_text(wr_loss_hatchery_labels, mapping = aes(x = wday + 4, y = cumul+10, label = factor(wy)), size = 3) +
+  #annotate(geom = 'text', 153, y = 1400, label = text_wys_hatch) +
+  scale_x_continuous(breaks = c(61, 92, 123, 153, 183, 213),
+                     labels = c('Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'),
+                     limits = c(61,213)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 12),
+        axis.title = element_text(size = 13),
+        strip.text = element_text(size = 12))
+hatchery_spaghetti
+
+cumulative_plots <- natural_spaghetti/hatchery_spaghetti
+
+tiff("Salmonids/appendix_outputs/Figure_wr_cumulative_historic.tiff", width = 8, height =8, units = "in", res = 300, compression = "lzw")
+cumulative_plots
+dev.off()

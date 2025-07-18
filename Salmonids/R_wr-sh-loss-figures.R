@@ -522,52 +522,46 @@ ggsave("Salmonids/output/steelhead_daily_and_cumul_loss.png",
 ###########################
 #historical loss comparison
 ###########################
-
 ###genetic winter-run by month
-CVP <- read_csv('Salmonids/data/CVP_genetics.csv')
-SWP <- read_csv('Salmonids/data/SWP_genetics.csv')
-
-wr_temp <- wr_loss %>% 
-  filter(adipose_clip == 'Unclipped' &
-           dna_race == 'Winter') %>%
+wr_all_years <- read_csv('https://www.cbr.washington.edu/sacramento/data/php/rpt/juv_loss_detail.php?sc=1&outputFormat=csv&year=all&species=1%3Af&dnaOnly=yes&age=no') %>%
+  clean_names() %>%
+  filter(dna_race == 'Winter')
+wr_historic_loss <- read_csv('Salmonids/data/genetic_wr_loss.csv') %>%
+  select(wy = 1, month = 2, loss = 3)
+wr_by_month <- wr_all_years %>%
   mutate(date = as.Date(sample_time)) %>%
-  group_by(date) %>%
-  summarize(n = sum(nfish)) %>%
+  mutate(month = month(date, label = TRUE),
+         wy = get_fy(date, opt_fy_start = '07-01')) %>%
+  group_by(wy, month) %>%
+  summarize(loss = sum(loss)) %>%
   ungroup() %>%
-  mutate(month = month(date, label = TRUE)) %>%
-  group_by(month) %>%
-  summarize(n = sum(n)) %>%
-  mutate(class = 'WY 2025')
-
-wr_by_month <- bind_rows(CVP, SWP) %>%
-  mutate(month = month(SampleDateTime, label = TRUE),
-         wy = get_fy(SampleDateTime, opt_fy_start = '07-01')) %>%
-  filter(Genetic_Assignment == 'Winter') %>%
-  group_by(month) %>%
-  summarize(n = n()) %>%
+  bind_rows(wr_historic_loss) %>%
+  mutate(class = if_else(wy == year(Sys.Date()), 'WY 2025', 'Historic (2010-2024)')) %>%
+  na.omit() %>%
+  group_by(class, month) %>%
+  summarize(loss = sum(loss)) %>%
+  mutate(prop = prop.table(loss)) %>%
   ungroup() %>%
-  mutate(class = 'Historic (2011-2024)') %>%
-  bind_rows(wr_temp) %>%
   mutate(month = factor(month, levels = c('Jul', 'Aug', 'Sep', 'Oct', 'Nov', 
-                                   'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 
-                                   'May', 'Jun'))) %>%
-  group_by(class) %>%
-  mutate(prop = prop.table(n)) %>%
-  ungroup() %>%
+                                          'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 
+                                          'May', 'Jun'))) %>%
   complete(month, class, fill = list(prop = NA))
+
 
 wr_month_graph <- wr_by_month %>%
   ggplot(aes(x = month, y = prop*100, fill = class)) +
   geom_col(color = 'black', position = 'dodge') +
   scale_fill_viridis_d() +
-  labs(y='Percent of Observed Salvage') +
+  labs(y='Percent of Loss', title = 'A) Natural-origin Winter-run Loss by month') +
   theme_bw(base_size = 14) +
   theme(
     text            = element_text(face = "bold"),
-    axis.text.x     = element_text(angle = 45, hjust = 1, face = "bold"),
-    legend.position = "bottom",
+    axis.text.x     = element_blank(),
+    axis.ticks = element_blank(),
+    legend.position = c(.2,.83),
     axis.title.x = element_blank(),
-    legend.title = element_blank()
+    legend.title = element_blank(),
+    
   )
 wr_month_graph
 
@@ -597,16 +591,19 @@ wr_hatch_month_graph <- wr_hatch_by_month %>%
   ggplot(aes(x = month, y = prop*100, fill = class)) +
   geom_col(color = 'black', position = 'dodge') +
   scale_fill_viridis_d() +
-  labs(y='Percent of Loss') +
+  labs(y='Percent of Loss', title = 'B) Hatchery-origin Winter-run Loss by month') +
   theme_bw(base_size = 14) +
   theme(
     text            = element_text(face = "bold"),
     axis.text.x     = element_text(angle = 45, hjust = 1, face = "bold"),
-    legend.position = "bottom",
+    legend.position = c(.2,.83),
     axis.title.x = element_blank(),
     legend.title = element_blank()
   )
 wr_hatch_month_graph
+
+wr_by_month_graph <- wr_month_graph/wr_hatch_month_graph
+ggsave(wr_by_month_graph, file = 'Salmonids/appendix_outputs/wr_loss_by_month.png', width = 8, height = 7)
 ###historic steelhead
 sh_import_all_years <- read_csv('https://www.cbr.washington.edu/sacramento/data/php/rpt/juv_loss_detail.php?sc=1&outputFormat=csv&year=all&species=2%3Af&dnaOnly=no&age=no') %>%
   clean_names()
