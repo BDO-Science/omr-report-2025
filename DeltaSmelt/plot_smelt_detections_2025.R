@@ -44,7 +44,8 @@ data_edsmL <- read_excel(here::here("DeltaSmelt/data/EDSM_LarJuv_2025.xlsx"))
 
 # Larval - Salvage, 20-mm (but these were all Hypomesus sp. this year)
 data_otherL <- read_excel(here::here("DeltaSmelt/data/Other_LarJuv_2025.xlsx")) %>%
-  left_join(sta_all)
+  left_join(sta_all) %>%
+  mutate(Source = if_else(Source == "CVP Salvage", "TFCF", Source))
 
 # Adult EDSM (from USFWS's running DS spreadsheet)
 data_adult <- read_excel(here::here("DeltaSmelt/data/USFWS_Adult_20250624_KS.xlsx"), sheet = 2) %>%
@@ -55,7 +56,7 @@ data_adult <- read_excel(here::here("DeltaSmelt/data/USFWS_Adult_20250624_KS.xls
 
 # Combine smelt 
 # For now, don't include larval IDs since they are Hypomesus sp.
-allsmelt <- bind_rows(data_edsmL, data_adult) %>%
+allsmelt <- bind_rows(data_otherL, data_edsmL, data_adult) %>%
   group_by(SampleDate, Source, Gear, Station, LifeStage, Mark, Latitude, Longitude) %>%
   summarize(Catch = sum(Catch, na.rm = TRUE)) %>%
   ungroup()
@@ -67,12 +68,12 @@ allsmelt_sf <- allsmelt %>%
 
 # Separate out datasets for adult vs larval/juvenile
 adult <- allsmelt_sf %>% 
-  filter(SampleDate < ymd("2025-06-01"))  %>%
+  filter(SampleDate < ymd("2025-04-01"))  %>%
   group_by(Station, Source) %>%
   summarize(totalCatch = sum(Catch))
 
 larjuv <- allsmelt_sf %>% 
-  filter(SampleDate > ymd("2025-06-01"))  %>%
+  filter(SampleDate > ymd("2025-04-01"))  %>%
   group_by(Station, Source) %>%
   summarize(totalCatch = sum(Catch))
 
@@ -103,11 +104,12 @@ mark <- allsmelt%>%
                                 pad_x = unit(.1, "in"), pad_y = unit(0.2, "in"),
                                 style = north_arrow_fancy_orienteering) +
     annotation_scale(location = "bl", bar_cols = c("black", "white", "black", "white")) +
-    guides(fill = guide_legend(nrow = 4, byrow = TRUE)) +
     scale_x_continuous(limits = c(-122.35, -121.3)) + 
     scale_y_continuous(limits = c(37.8, 38.6)) +
-    scale_shape_manual(values = c(6, 17, 20, 12, 10))+
+    scale_shape_manual(values = c(20, 6, 17, 12, 4))+
+    scale_size(range = c(2,7), breaks = c(1, 2, 3,4,5,6)) + 
     viridis::scale_fill_viridis(option = "turbo", discrete = TRUE) + 
+    guides(fill = guide_legend(nrow = 3, byrow = TRUE)) +
     theme_bw()+
     theme(axis.title.x = element_blank(),
           axis.title.y = element_blank(),
@@ -122,8 +124,8 @@ mark <- allsmelt%>%
 (map_detections_lj <- ggplot() + 
     geom_sf(data = WW_Delta, color = "darkslategray3") +
     geom_sf(data = R_EDSM_Strata_1718P1, aes(fill = Stratum), alpha = 0.4,inherit.aes = FALSE)+
-    geom_sf(data = larjuv, aes(shape = Source, size = totalCatch),   inherit.aes = FALSE) + 
     geom_sf(data = releases_sf, shape = 23, size =3,  fill = "red", color = "black", inherit.aes = FALSE) + 
+    geom_sf(data = larjuv, aes(shape = Source, size = totalCatch),   inherit.aes = FALSE) + 
     # geom_sf_text(data = sls_sf, mapping = aes(label = Station), size = 3, nudge_x = -0.012, nudge_y = 0.016) +
     annotation_north_arrow(location = "tl", which_north = "true",
                            pad_x = unit(.1, "in"), pad_y = unit(0.2, "in"),
@@ -131,7 +133,8 @@ mark <- allsmelt%>%
     annotation_scale(location = "bl", bar_cols = c("black", "white", "black", "white")) +
     scale_x_continuous(limits = c(-122.35, -121.3)) + 
     scale_y_continuous(limits = c(37.8, 38.6)) +
-    scale_shape_manual(values = c(16, 17, 14))+
+    scale_shape_manual(values = c(15, 17, 4))+
+    scale_size(range = c(2, 3), breaks = c(1,2)) + 
     viridis::scale_fill_viridis(option = "turbo", discrete = TRUE) + 
     guides(fill = guide_legend(nrow = 3, byrow = TRUE)) +
     theme_bw() +
@@ -139,8 +142,9 @@ mark <- allsmelt%>%
           axis.title.y = element_blank(),
           axis.text = element_text(size = 10),
           axis.text.x = element_text(angle = 45, vjust = 0.5),
-          legend.position = "top", legend.title = element_blank(),
+          legend.position = "top",
           legend.box = "vertical",
+          legend.title = element_blank(),
           legend.text = element_text(size = 9)))
 
 # Releases
@@ -183,7 +187,7 @@ tiff("DeltaSmelt/output/Figure_map_adultDS.tiff", width = 7.8, height = 7.5, uni
 map_detections_a
 dev.off()
 
-tiff("DeltaSmelt/output/Figure_map_ljuvDS.tiff", width = 7.8, height = 8.5, units = "in", res = 300, compression = "lzw")
+tiff("DeltaSmelt/output/Figure_map_ljuvDS.tiff", width = 7.8, height = 7.5, units = "in", res = 300, compression = "lzw")
 map_detections_lj
 dev.off()
 
