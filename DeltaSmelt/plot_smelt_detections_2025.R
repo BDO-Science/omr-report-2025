@@ -40,10 +40,10 @@ releases_sf <- release_info %>%
 ## Read in fish data ----------------------------------------------
 
 # Juvenile EDSM 
-data_edsmL <- read_excel(here::here("DeltaSmelt/data/EDSM_LarJuv_2025.xlsx"))
+data_edsmJ <- read_excel(here::here("DeltaSmelt/data/EDSM_LarJuv_2025.xlsx"))
 
 # Larval - Salvage, 20-mm (but these were all Hypomesus sp. this year)
-data_otherL <- read_excel(here::here("DeltaSmelt/data/Other_LarJuv_2025.xlsx")) %>%
+data_larvae <- read_excel(here::here("DeltaSmelt/data/Other_LarJuv_2025.xlsx")) %>%
   left_join(sta_all) %>%
   mutate(Source = if_else(Source == "CVP Salvage", "TFCF", Source))
 
@@ -56,7 +56,7 @@ data_adult <- read_excel(here::here("DeltaSmelt/data/USFWS_Adult_20250624_KS.xls
 
 # Combine smelt 
 # For now, don't include larval IDs since they are Hypomesus sp.
-allsmelt <- bind_rows(data_otherL, data_edsmL, data_adult) %>%
+allsmelt <- bind_rows(data_edsmJ, data_adult) %>%
   group_by(SampleDate, Source, Gear, Station, LifeStage, Mark, Latitude, Longitude) %>%
   summarize(Catch = sum(Catch, na.rm = TRUE)) %>%
   ungroup()
@@ -77,6 +77,7 @@ larjuv <- allsmelt_sf %>%
   group_by(Station, Source) %>%
   summarize(totalCatch = sum(Catch))
 
+# Sum adults by release location
 adult_mark <- allsmelt_sf %>%
   filter(SampleDate < ymd("2025-06-01"))  %>%
   group_by(Station, Source, Mark) %>%
@@ -88,6 +89,7 @@ adult_mark <- allsmelt_sf %>%
   mutate(MarkCode = replace(MarkCode, is.na(MarkCode), "None")) %>%
   mutate(Release = paste0(ReleaseDate, ReleaseSite))
 
+# Summarize number of fish for each release
 mark <- allsmelt%>%
   group_by(Gear, LifeStage, Mark) %>%
   summarize(total = sum(Catch))
@@ -134,7 +136,7 @@ mark <- allsmelt%>%
     scale_x_continuous(limits = c(-122.35, -121.3)) + 
     scale_y_continuous(limits = c(37.8, 38.6)) +
     scale_shape_manual(values = c(15, 17, 4))+
-    scale_size(range = c(2, 3), breaks = c(1,2)) + 
+    scale_size(range = c(2, 2), breaks = c(1,1)) + 
     viridis::scale_fill_viridis(option = "turbo", discrete = TRUE) + 
     guides(fill = guide_legend(nrow = 3, byrow = TRUE)) +
     theme_bw() +
