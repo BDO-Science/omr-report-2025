@@ -14,23 +14,51 @@ report_year = 2025
 
 ## Download data
 url_escapement <- "https://www.cbr.washington.edu/sacramento/data/php/rpt/grandtab_graph.php?sc=1&outputFormat=csv&species=Chinook%3AWinter&type=All&locType=location&location=Sacramento+and+San+Joaquin+River+Systems%3AAll%3AAll"
-escapement <- read_csv(url_escapement) %>%
+url_escapement2 <- "https://www.cbr.washington.edu/sacramento/data/php/rpt/grandtab_graph.php?sc=1&outputFormat=csv&species=Chinook%3AWinter&type=In-River&locType=div_group&location=Basalt+and+Porous+Lava"
+url_escapementh <- "https://www.cbr.washington.edu/sacramento/data/php/rpt/grandtab_graph.php?sc=1&outputFormat=csv&species=Chinook%3AWinter&type=Hatchery&locType=div_group&location=Basalt+and+Porous+Lava"
+
+## Hatchery transfer data
+escapementh <- read_csv(url_escapementh)%>%
   clean_names() %>%
   rename(Year = end_year_of_monitoring_period) %>%
   filter(!is.na(population_estimate)) %>%
   mutate(Year2 = as.numeric(substr(Year, start = 1, stop = 4)),
          Year = factor(Year2)) %>%
-  filter(Year2 > report_year -10)
+  filter(Year2 > report_year -11) %>%
+  rename(population_estimateh = population_estimate)
+
+## Battle Creek and Mainstem -- Join hatchery
+escapement <- read_csv(url_escapement2) %>%
+  clean_names() %>%
+  rename(Year = end_year_of_monitoring_period) %>%
+  filter(!is.na(population_estimate)) %>%
+  mutate(Year2 = as.numeric(substr(Year, start = 1, stop = 4)),
+         Year = factor(Year2)) %>%
+  filter(Year2 > report_year -11) %>%
+  left_join(escapementh)
+escapement_long <- escapement %>%
+  rename(battle_creek = battle_creek_upstream_of_cnfh,
+         mainstem = mainstem_upstream_of_rbdd,
+         hatchery_cnfh = hatchery_transfers_to_battle_creek_cnfh,
+         hatchery_lsnfh = hatchery_transfers_to_livingston_stone_nfh) %>%
+  pivot_longer(cols = c(battle_creek,mainstem, hatchery_cnfh, hatchery_lsnfh),
+               names_to = "source",
+               values_to = "escapement") %>%
+  mutate(pop_estimate = population_estimate+population_estimateh) %>%
+  mutate(source = factor(source, levels = c("battle_creek", "mainstem", "hatchery_cnfh", "hatchery_lsnfh")))
 
 ## Make plot
-(plot_escapement <- ggplot(escapement) + 
-  geom_col(aes(Year, population_estimate), fill = "steelblue4") +
-    geom_text(aes(Year, population_estimate +300, label = population_estimate), size = 4.5) + 
-  geom_hline(yintercept = mean(escapement$population_estimate), linetype = "dashed") + 
+(plot_escapement <- ggplot(escapement_long) + 
+  geom_col(aes(Year, escapement, fill = source)) +
+    geom_text(aes(Year, pop_estimate +300, label = pop_estimate), size = 4.5) + 
+  geom_hline(yintercept = mean(unique(escapement_long$pop_estimate)), linetype = "dashed") + 
   labs(y = "Escapement", x = "Brood Year")+
+    viridis::scale_fill_viridis(discrete = TRUE) + 
+    # scale_fill_manual(values = c("navy",  "steelblue3","magenta4","pink3"))+
   theme_bw() +
     theme(axis.text = element_text(size = 11),
-          axis.title = element_text(size = 12)))
+          axis.title = element_text(size = 12),
+          legend.position = "top"))
 
 ## Write plot
 tiff("Salmonids/appendix_outputs/Figure_escapement.tiff", width = 7, height = 5, units = "in", res = 300, compression = "lzw")
@@ -39,7 +67,7 @@ dev.off()
 
 # JPI ------------------------------
 # JPI spreadsheet data from JPE letter. 
-# USFWS (Bill Poytress) will eventually update some of the values from 2022 on.
+# USFWS (Bill Poytress) report - updated spreadsheet for data through BY 2023.
 
 jpi <- read_csv(here("Salmonids/data/JPI_2002_2024.csv")) %>%
   clean_names() %>%
@@ -71,7 +99,11 @@ plot_jpi
 dev.off()
 
 # TDM and ETF --------------------------------------
-# TDM Data from CVTEMP
+# TDM Data from SWFSC (check with Elissa; Miles Daniels). Shasta report has hindcasts
+# for Martin and Anderson model, some of these are from SacPAS fish model. 
+# SWFSC has a "final" TDM based on Martin model and some
+# of their own alterations. This is not really reported anywhere but they usually provide
+# a hindcast report as part of the Shasta CWP seasonal report. 
 
 tdm <- read.csv(here("Salmonids/data/ETF_TDM_2002_2024.csv")) %>%
   mutate(unexplained_mortality = 100-ETF_Survival-TDM_NOAA_percent) %>%
@@ -121,7 +153,7 @@ yrcolors <- rev(tdm$color)
 
 (plot_etf <- ggplot(jpi) + 
     geom_col(aes(by, etf_survival), fill = "goldenrod", alpha = 0.8, width = 0.8) +
-    geom_text(aes(by, etf_survival +2, label = etf_survival_lab), size =  4) + 
+    geom_text(aes(by, etf_survival +1.5, label = etf_survival_lab), size =  4) + 
     geom_hline(yintercept = mean(jpi$etf_survival), linetype = "dashed") + 
     labs(y = "Egg-to-Fry Survival (%)") +
     # scale_y_continuous(expand = c(0,0)) + 
