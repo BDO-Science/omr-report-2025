@@ -1,0 +1,471 @@
+WaterYear,Date,Survey,Station,Time,Species,LFS Catch,Region
+2025,12/30/2024,1,315,10:29,No LFS Catch,0,San Pablo Bay
+2025,12/30/2024,1,322,11:49,Longfin Smelt,1,San Pablo Bay
+2025,12/30/2024,1,323,12:25,Longfin Smelt,3,San Pablo Bay
+2025,12/30/2024,1,327,10:10,Longfin Smelt,1,San Pablo Bay
+2025,12/30/2024,1,328,9:51,Longfin Smelt,3,San Pablo Bay
+2025,12/30/2024,1,329,9:12,Longfin Smelt,12,San Pablo Bay
+2025,12/30/2024,1,330,12:06,No LFS Catch,0,San Pablo Bay
+2025,12/30/2024,1,335,9:32,Longfin Smelt,17,San Pablo Bay
+2025,12/30/2024,1,336,8:53,Longfin Smelt,5,San Pablo Bay
+2025,12/30/2024,1,338,8:35,Longfin Smelt,19,San Pablo Bay
+2025,12/30/2024,1,401,8:16,Longfin Smelt,13,Suisun Bay and West
+2025,12/30/2024,1,809,8:22,Longfin Smelt,17,Central & South Delta
+2025,12/30/2024,1,812,8:56,Longfin Smelt,1,Central & South Delta
+2025,12/30/2024,1,815,10:06,No LFS Catch,0,Central & South Delta
+2025,12/30/2024,1,901,9:30,Longfin Smelt,3,Central & South Delta
+2025,12/30/2024,1,902,10:41,No LFS Catch,0,Central & South Delta
+2025,12/30/2024,1,906,15:23,Longfin Smelt,1,Central & South Delta
+2025,12/30/2024,1,910,14:53,No LFS Catch,0,Central & South Delta
+2025,12/30/2024,1,912,14:16,No LFS Catch,0,Central & South Delta
+2025,12/30/2024,1,914,13:03,No LFS Catch,0,Central & South Delta
+2025,12/30/2024,1,915,11:18,No LFS Catch,0,Central & South Delta
+2025,12/30/2024,1,918,12:04,No LFS Catch,0,Central & South Delta
+2025,12/30/2024,1,919,16:00,No LFS Catch,0,Central & South Delta
+2025,12/31/2024,1,340,8:11,Longfin Smelt,44,Napa River
+2025,12/31/2024,1,342,9:09,Longfin Smelt,15,Napa River
+2025,12/31/2024,1,343,9:32,Longfin Smelt,11,Napa River
+2025,12/31/2024,1,344,10:04,Longfin Smelt,4,Napa River
+2025,12/31/2024,1,345,10:25,Longfin Smelt,2,Napa River
+2025,12/31/2024,1,346,10:46,No LFS Catch,0,Napa River
+2025,12/31/2024,1,347,11:05,No LFS Catch,0,Napa River
+2025,12/31/2024,1,348,11:29,No LFS Catch,0,Napa River
+2025,12/31/2024,1,349,11:51,No LFS Catch,0,Napa River
+2025,12/2/2024,12,306,10:52,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,308,10:29,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,311,11:13,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,315,10:10,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,322,11:37,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,323,12:17,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,327,9:51,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,328,9:34,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,329,8:59,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,330,11:55,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,335,9:16,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,336,12:46,No LFS Catch,0,San Pablo Bay
+2025,12/2/2024,12,404,13:22,Longfin Smelt,1,Suisun Bay and West
+2025,12/2/2024,12,405,13:44,No LFS Catch,0,Suisun Bay and West
+2025,12/2/2024,12,809,8:09,Longfin Smelt,1,Central & South Delta
+2025,12/2/2024,12,812,8:33,Longfin Smelt,1,Central & South Delta
+2025,12/2/2024,12,815,8:59,No LFS Catch,0,Central & South Delta
+2025,12/2/2024,12,901,9:25,No LFS Catch,0,Central & South Delta
+2025,12/2/2024,12,902,9:56,Longfin Smelt,1,Central & South Delta
+2025,12/2/2024,12,906,13:25,No LFS Catch,0,Central & South Delta
+2025,12/2/2024,12,910,13:03,No LFS Catch,0,Central & South Delta
+2025,12/2/2024,12,912,12:23,No LFS Catch,0,Central & South Delta
+2025,12/2/2024,12,914,11:41,No LFS Catch,0,Central & South Delta
+2025,12/2/2024,12,915,10:21,No LFS Catch,0,Central & South Delta
+2025,12/2/2024,12,918,10:57,No LFS Catch,0,Central & South Delta
+2025,12/2/2024,12,919,14:01,No LFS Catch,0,Central & South Delta
+2025,12/3/2024,12,338,9:13,No LFS Catch,0,San Pablo Bay
+2025,12/3/2024,12,340,9:35,No LFS Catch,0,Napa River
+2025,12/3/2024,12,342,9:59,No LFS Catch,0,Napa River
+2025,12/3/2024,12,343,10:25,No LFS Catch,0,Napa River
+2025,12/3/2024,12,344,10:56,No LFS Catch,0,Napa River
+2025,12/3/2024,12,345,11:35,No LFS Catch,0,Napa River
+2025,12/3/2024,12,346,11:54,No LFS Catch,0,Napa River
+2025,12/3/2024,12,347,12:15,No LFS Catch,0,Napa River
+2025,12/3/2024,12,348,12:36,No LFS Catch,0,Napa River
+2025,12/3/2024,12,349,13:00,No LFS Catch,0,Napa River
+2025,12/3/2024,12,401,8:51,No LFS Catch,0,Suisun Bay and West
+2025,12/3/2024,12,513,13:34,Longfin Smelt,1,Confluence
+2025,12/3/2024,12,520,13:57,Longfin Smelt,1,Confluence
+2025,12/3/2024,12,703,12:45,No LFS Catch,0,Sacramento River System
+2025,12/3/2024,12,704,12:23,No LFS Catch,0,Sacramento River System
+2025,12/3/2024,12,705,9:07,No LFS Catch,0,Sacramento River System
+2025,12/3/2024,12,706,12:04,No LFS Catch,0,Sacramento River System
+2025,12/3/2024,12,707,9:24,No LFS Catch,0,Sacramento River System
+2025,12/3/2024,12,711,9:49,No LFS Catch,0,Sacramento River System
+2025,12/3/2024,12,716,10:38,No LFS Catch,0,Sacramento River System
+2025,12/3/2024,12,723,10:15,No LFS Catch,0,Sacramento River System
+2025,12/3/2024,12,801,13:10,No LFS Catch,0,Confluence
+2025,12/3/2024,12,804,14:21,No LFS Catch,0,Confluence
+2025,12/4/2024,12,418,10:03,Longfin Smelt,1,Suisun Bay and West
+2025,12/4/2024,12,602,9:37,Longfin Smelt,1,Suisun Bay and West
+2025,12/4/2024,12,606,9:10,No LFS Catch,0,Suisun Bay and West
+2025,12/4/2024,12,609,8:41,No LFS Catch,0,Suisun Bay and West
+2025,12/4/2024,12,610,8:14,No LFS Catch,0,Suisun Bay and West
+2025,12/5/2024,12,411,8:42,Longfin Smelt,1,Suisun Bay and West
+2025,12/5/2024,12,501,9:11,Longfin Smelt,1,Suisun Bay and West
+2025,12/5/2024,12,504,9:36,No LFS Catch,0,Suisun Bay and West
+2025,12/5/2024,12,508,10:23,Longfin Smelt,2,Confluence
+2025,12/5/2024,12,519,9:58,Longfin Smelt,1,Suisun Bay and West
+2025,12/16/2024,13,338,8:57,No LFS Catch,0,San Pablo Bay
+2025,12/16/2024,13,340,9:22,No LFS Catch,0,Napa River
+2025,12/16/2024,13,342,9:48,No LFS Catch,0,Napa River
+2025,12/16/2024,13,343,10:12,No LFS Catch,0,Napa River
+2025,12/16/2024,13,344,10:45,No LFS Catch,0,Napa River
+2025,12/16/2024,13,345,11:11,No LFS Catch,0,Napa River
+2025,12/16/2024,13,346,11:34,No LFS Catch,0,Napa River
+2025,12/16/2024,13,347,11:54,No LFS Catch,0,Napa River
+2025,12/16/2024,13,348,12:21,No LFS Catch,0,Napa River
+2025,12/16/2024,13,349,12:47,No LFS Catch,0,Napa River
+2025,12/16/2024,13,401,8:37,No LFS Catch,0,Suisun Bay and West
+2025,12/16/2024,13,809,8:11,Longfin Smelt,1,Central & South Delta
+2025,12/16/2024,13,812,8:40,Longfin Smelt,1,Central & South Delta
+2025,12/16/2024,13,815,9:07,No LFS Catch,0,Central & South Delta
+2025,12/16/2024,13,901,9:36,Longfin Smelt,2,Central & South Delta
+2025,12/16/2024,13,902,10:07,No LFS Catch,0,Central & South Delta
+2025,12/16/2024,13,906,14:42,Longfin Smelt,2,Central & South Delta
+2025,12/16/2024,13,910,14:18,No LFS Catch,0,Central & South Delta
+2025,12/16/2024,13,912,13:37,No LFS Catch,0,Central & South Delta
+2025,12/16/2024,13,914,12:48,No LFS Catch,0,Central & South Delta
+2025,12/16/2024,13,915,10:34,No LFS Catch,0,Central & South Delta
+2025,12/16/2024,13,918,11:55,No LFS Catch,0,Central & South Delta
+2025,12/16/2024,13,919,15:13,No LFS Catch,0,Central & South Delta
+2025,12/17/2024,13,306,11:05,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,308,10:46,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,311,11:27,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,315,10:27,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,322,11:46,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,323,12:26,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,327,10:08,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,328,9:51,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,329,9:13,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,330,12:05,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,335,9:31,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,336,8:54,No LFS Catch,0,San Pablo Bay
+2025,12/17/2024,13,404,13:56,No LFS Catch,0,Suisun Bay and West
+2025,12/17/2024,13,405,13:34,No LFS Catch,0,Suisun Bay and West
+2025,12/17/2024,13,513,11:58,Longfin Smelt,1,Confluence
+2025,12/17/2024,13,520,12:38,Longfin Smelt,3,Confluence
+2025,12/17/2024,13,703,11:32,Longfin Smelt,3,Sacramento River System
+2025,12/17/2024,13,704,11:14,No LFS Catch,0,Sacramento River System
+2025,12/17/2024,13,705,8:20,Longfin Smelt,5,Sacramento River System
+2025,12/17/2024,13,706,10:53,No LFS Catch,0,Sacramento River System
+2025,12/17/2024,13,707,8:38,Longfin Smelt,1,Sacramento River System
+2025,12/17/2024,13,711,9:09,No LFS Catch,0,Sacramento River System
+2025,12/17/2024,13,716,9:38,No LFS Catch,0,Sacramento River System
+2025,12/17/2024,13,723,9:58,No LFS Catch,0,Sacramento River System
+2025,12/17/2024,13,804,13:03,Longfin Smelt,2,Confluence
+2025,12/18/2024,13,411,15:36,No LFS Catch,0,Suisun Bay and West
+2025,12/18/2024,13,418,10:25,Longfin Smelt,10,Suisun Bay and West
+2025,12/18/2024,13,501,15:11,Longfin Smelt,1,Suisun Bay and West
+2025,12/18/2024,13,504,14:46,Longfin Smelt,3,Suisun Bay and West
+2025,12/18/2024,13,508,14:02,Longfin Smelt,3,Confluence
+2025,12/18/2024,13,519,14:25,Longfin Smelt,5,Suisun Bay and West
+2025,12/18/2024,13,602,11:00,Longfin Smelt,24,Suisun Bay and West
+2025,12/18/2024,13,606,11:35,Longfin Smelt,1,Suisun Bay and West
+2025,12/18/2024,13,609,12:19,Longfin Smelt,1,Suisun Bay and West
+2025,12/18/2024,13,610,12:48,Longfin Smelt,4,Suisun Bay and West
+2025,12/18/2024,13,801,13:31,Longfin Smelt,1,Confluence
+2025,12/30/2024,1,306,11:08,No LFS Catch,0,San Pablo Bay
+2025,12/30/2024,1,308,10:50,No LFS Catch,0,San Pablo Bay
+2025,12/30/2024,1,311,11:30,Longfin Smelt,2,San Pablo Bay
+2025,12/31/2024,1,404,14:02,Longfin Smelt,4,Suisun Bay and West
+2025,12/31/2024,1,405,14:20,Longfin Smelt,35,Suisun Bay and West
+2025,12/31/2024,1,513,13:56,Longfin Smelt,46,Confluence
+2025,12/31/2024,1,520,14:43,Longfin Smelt,37,Confluence
+2025,12/31/2024,1,703,12:49,Longfin Smelt,3,Sacramento River System
+2025,12/31/2024,1,704,12:28,Longfin Smelt,4,Sacramento River System
+2025,12/31/2024,1,705,8:58,Longfin Smelt,2,Sacramento River System
+2025,12/31/2024,1,706,12:01,Longfin Smelt,18,Sacramento River System
+2025,12/31/2024,1,707,11:34,No LFS Catch,0,Sacramento River System
+2025,12/31/2024,1,711,10:50,No LFS Catch,0,Sacramento River System
+2025,12/31/2024,1,716,10:17,No LFS Catch,0,Sacramento River System
+2025,12/31/2024,1,723,9:55,Longfin Smelt,2,Sacramento River System
+2025,12/31/2024,1,804,13:20,Longfin Smelt,20,Confluence
+2025,1/2/2025,1,411,11:04,Longfin Smelt,92,Suisun Bay and West
+2025,1/2/2025,1,418,10:41,Longfin Smelt,11,Suisun Bay and West
+2025,1/2/2025,1,501,11:31,Longfin Smelt,8,Suisun Bay and West
+2025,1/2/2025,1,504,11:58,No LFS Catch,0,Suisun Bay and West
+2025,1/2/2025,1,508,12:46,Longfin Smelt,5,Confluence
+2025,1/2/2025,1,519,12:19,Longfin Smelt,9,Suisun Bay and West
+2025,1/2/2025,1,602,10:14,Longfin Smelt,33,Suisun Bay and West
+2025,1/2/2025,1,606,9:43,Longfin Smelt,4,Suisun Bay and West
+2025,1/2/2025,1,609,9:10,Longfin Smelt,2,Suisun Bay and West
+2025,1/2/2025,1,610,8:37,Longfin Smelt,3,Suisun Bay and West
+2025,1/2/2025,1,801,7:55,Longfin Smelt,1,Confluence
+2025,1/13/2025,2,809,8:08,Longfin Smelt,41,Central & South Delta
+2025,1/13/2025,2,812,8:33,Longfin Smelt,19,Central & South Delta
+2025,1/14/2025,2,306,11:25,No LFS Catch,0,San Pablo Bay
+2025,1/14/2025,2,308,11:00,No LFS Catch,0,San Pablo Bay
+2025,1/14/2025,2,311,11:46,No LFS Catch,0,San Pablo Bay
+2025,1/14/2025,2,315,10:42,No LFS Catch,0,San Pablo Bay
+2025,1/14/2025,2,322,12:04,Longfin Smelt,1,San Pablo Bay
+2025,1/14/2025,2,323,12:41,Longfin Smelt,10,San Pablo Bay
+2025,1/14/2025,2,327,10:25,Longfin Smelt,4,San Pablo Bay
+2025,1/14/2025,2,328,10:10,Longfin Smelt,46,San Pablo Bay
+2025,1/14/2025,2,329,9:36,Longfin Smelt,132,San Pablo Bay
+2025,1/14/2025,2,330,12:21,No LFS Catch,0,San Pablo Bay
+2025,1/14/2025,2,335,9:52,Longfin Smelt,61,San Pablo Bay
+2025,1/14/2025,2,336,9:20,Longfin Smelt,31,San Pablo Bay
+2025,1/14/2025,2,338,9:03,Longfin Smelt,148,San Pablo Bay
+2025,1/14/2025,2,401,8:44,Longfin Smelt,103,Suisun Bay and West
+2025,1/14/2025,2,815,8:26,Longfin Smelt,6,Central & South Delta
+2025,1/14/2025,2,901,7:59,Longfin Smelt,2,Central & South Delta
+2025,1/14/2025,2,902,8:51,Longfin Smelt,2,Central & South Delta
+2025,1/14/2025,2,906,13:08,No LFS Catch,0,Central & South Delta
+2025,1/14/2025,2,910,12:44,No LFS Catch,0,Central & South Delta
+2025,1/14/2025,2,912,11:32,No LFS Catch,0,Central & South Delta
+2025,1/14/2025,2,914,10:46,Longfin Smelt,2,Central & South Delta
+2025,1/14/2025,2,915,9:16,Longfin Smelt,1,Central & South Delta
+2025,1/14/2025,2,918,10:25,Longfin Smelt,1,Central & South Delta
+2025,1/14/2025,2,919,13:44,No LFS Catch,0,Central & South Delta
+2025,1/15/2025,2,340,8:59,Longfin Smelt,43,Napa River
+2025,1/15/2025,2,342,9:26,Longfin Smelt,40,Napa River
+2025,1/15/2025,2,343,9:49,Longfin Smelt,115,Napa River
+2025,1/15/2025,2,344,10:21,Longfin Smelt,438,Napa River
+2025,1/15/2025,2,345,10:42,Longfin Smelt,27,Napa River
+2025,1/15/2025,2,346,11:14,Longfin Smelt,475,Napa River
+2025,1/15/2025,2,347,11:34,Longfin Smelt,652,Napa River
+2025,1/15/2025,2,348,11:56,Longfin Smelt,65,Napa River
+2025,1/15/2025,2,349,12:17,Longfin Smelt,5,Napa River
+2025,1/15/2025,2,404,13:55,Longfin Smelt,33,Suisun Bay and West
+2025,1/15/2025,2,405,14:17,Longfin Smelt,83,Suisun Bay and West
+2025,1/15/2025,2,513,11:57,Longfin Smelt,46,Confluence
+2025,1/15/2025,2,520,13:35,Longfin Smelt,53,Confluence
+2025,1/15/2025,2,703,11:32,Longfin Smelt,8,Sacramento River System
+2025,1/15/2025,2,704,11:14,Longfin Smelt,21,Sacramento River System
+2025,1/15/2025,2,705,8:25,Longfin Smelt,16,Sacramento River System
+2025,1/15/2025,2,706,10:54,Longfin Smelt,36,Sacramento River System
+2025,1/15/2025,2,707,8:42,Longfin Smelt,67,Sacramento River System
+2025,1/15/2025,2,711,9:08,Longfin Smelt,6,Sacramento River System
+2025,1/15/2025,2,716,9:51,Longfin Smelt,11,Sacramento River System
+2025,1/15/2025,2,723,9:32,Longfin Smelt,9,Sacramento River System
+2025,1/15/2025,2,804,13:57,Longfin Smelt,30,Confluence
+2025,1/16/2025,2,411,10:56,Longfin Smelt,84,Suisun Bay and West
+2025,1/16/2025,2,418,10:31,Longfin Smelt,118,Suisun Bay and West
+2025,1/16/2025,2,501,11:23,Longfin Smelt,154,Suisun Bay and West
+2025,1/16/2025,2,504,11:46,Longfin Smelt,184,Suisun Bay and West
+2025,1/16/2025,2,508,12:30,Longfin Smelt,44,Confluence
+2025,1/16/2025,2,519,12:07,Longfin Smelt,45,Suisun Bay and West
+2025,1/16/2025,2,602,10:07,Longfin Smelt,210,Suisun Bay and West
+2025,1/16/2025,2,606,9:38,Longfin Smelt,4,Suisun Bay and West
+2025,1/16/2025,2,609,9:02,Longfin Smelt,4,Suisun Bay and West
+2025,1/16/2025,2,610,8:32,Longfin Smelt,33,Suisun Bay and West
+2025,1/16/2025,2,801,7:52,Longfin Smelt,30,Confluence
+2025,1/27/2025,3,306,10:48,No LFS Catch,0,San Pablo Bay
+2025,1/27/2025,3,308,10:26,No LFS Catch,0,San Pablo Bay
+2025,1/27/2025,3,311,11:10,No LFS Catch,0,San Pablo Bay
+2025,1/27/2025,3,315,10:06,No LFS Catch,0,San Pablo Bay
+2025,1/27/2025,3,322,11:28,No LFS Catch,0,San Pablo Bay
+2025,1/27/2025,3,323,12:08,Longfin Smelt,1,San Pablo Bay
+2025,1/27/2025,3,327,9:49,Longfin Smelt,1,San Pablo Bay
+2025,1/27/2025,3,328,9:32,Longfin Smelt,2,San Pablo Bay
+2025,1/27/2025,3,329,8:54,Longfin Smelt,2,San Pablo Bay
+2025,1/27/2025,3,330,11:47,No LFS Catch,0,San Pablo Bay
+2025,1/27/2025,3,335,9:13,No LFS Catch,0,San Pablo Bay
+2025,1/27/2025,3,336,8:36,Longfin Smelt,2,San Pablo Bay
+2025,1/27/2025,3,401,13:28,Longfin Smelt,1,Suisun Bay and West
+2025,1/27/2025,3,404,13:06,Longfin Smelt,2,Suisun Bay and West
+2025,1/27/2025,3,405,12:44,Longfin Smelt,8,Suisun Bay and West
+2025,1/27/2025,3,809,8:11,Longfin Smelt,58,Central & South Delta
+2025,1/27/2025,3,812,8:38,Longfin Smelt,11,Central & South Delta
+2025,1/27/2025,3,815,9:00,Longfin Smelt,2,Central & South Delta
+2025,1/27/2025,3,901,9:24,Longfin Smelt,1,Central & South Delta
+2025,1/27/2025,3,902,9:53,Longfin Smelt,2,Central & South Delta
+2025,1/27/2025,3,906,13:55,Longfin Smelt,3,Central & South Delta
+2025,1/27/2025,3,910,13:33,Longfin Smelt,1,Central & South Delta
+2025,1/27/2025,3,912,12:38,No LFS Catch,0,Central & South Delta
+2025,1/27/2025,3,914,11:55,No LFS Catch,0,Central & South Delta
+2025,1/27/2025,3,915,10:18,No LFS Catch,0,Central & South Delta
+2025,1/27/2025,3,918,10:52,Longfin Smelt,2,Central & South Delta
+2025,1/27/2025,3,919,14:30,No LFS Catch,0,Central & South Delta
+2025,1/28/2025,3,338,9:50,No LFS Catch,0,San Pablo Bay
+2025,1/28/2025,3,340,10:15,Longfin Smelt,4,Napa River
+2025,1/28/2025,3,342,10:45,Longfin Smelt,2,Napa River
+2025,1/28/2025,3,343,11:12,Longfin Smelt,53,Napa River
+2025,1/28/2025,3,344,11:44,Longfin Smelt,158,Napa River
+2025,1/28/2025,3,345,12:27,Longfin Smelt,182,Napa River
+2025,1/28/2025,3,346,12:51,Longfin Smelt,620,Napa River
+2025,1/28/2025,3,347,13:11,Longfin Smelt,364,Napa River
+2025,1/28/2025,3,348,13:36,Longfin Smelt,945,Napa River
+2025,1/28/2025,3,349,13:56,Longfin Smelt,431,Napa River
+2025,1/28/2025,3,513,12:21,Longfin Smelt,363,Confluence
+2025,1/28/2025,3,520,14:13,Longfin Smelt,1176,Confluence
+2025,1/28/2025,3,703,11:54,Longfin Smelt,67,Sacramento River System
+2025,1/28/2025,3,704,11:33,Longfin Smelt,33,Sacramento River System
+2025,1/28/2025,3,705,8:53,Longfin Smelt,14,Sacramento River System
+2025,1/28/2025,3,706,11:15,Longfin Smelt,6,Sacramento River System
+2025,1/28/2025,3,707,8:39,Longfin Smelt,33,Sacramento River System
+2025,1/28/2025,3,711,9:34,Longfin Smelt,1,Sacramento River System
+2025,1/28/2025,3,716,10:19,Longfin Smelt,2,Sacramento River System
+2025,1/28/2025,3,723,9:58,Longfin Smelt,6,Sacramento River System
+2025,1/28/2025,3,804,14:36,Longfin Smelt,121,Confluence
+2025,1/29/2025,3,411,12:43,Longfin Smelt,1,Suisun Bay and West
+2025,1/29/2025,3,418,12:18,Longfin Smelt,22,Suisun Bay and West
+2025,1/29/2025,3,501,13:07,Longfin Smelt,195,Suisun Bay and West
+2025,1/29/2025,3,504,13:31,Longfin Smelt,59,Suisun Bay and West
+2025,1/29/2025,3,508,14:14,Longfin Smelt,82,Confluence
+2025,1/29/2025,3,519,13:51,Longfin Smelt,312,Suisun Bay and West
+2025,1/29/2025,3,602,11:52,Longfin Smelt,107,Suisun Bay and West
+2025,1/29/2025,3,606,11:32,Longfin Smelt,53,Suisun Bay and West
+2025,1/29/2025,3,609,10:33,Longfin Smelt,43,Suisun Bay and West
+2025,1/29/2025,3,610,10:04,Longfin Smelt,49,Suisun Bay and West
+2025,1/29/2025,3,801,9:23,Longfin Smelt,84,Confluence
+2025,2/10/2025,4,306,10:37,Longfin Smelt,3,San Pablo Bay
+2025,2/10/2025,4,308,10:20,Longfin Smelt,3,San Pablo Bay
+2025,2/10/2025,4,311,10:59,Longfin Smelt,8,San Pablo Bay
+2025,2/10/2025,4,315,10:01,Longfin Smelt,55,San Pablo Bay
+2025,2/10/2025,4,322,11:19,Longfin Smelt,12,San Pablo Bay
+2025,2/10/2025,4,323,11:55,Longfin Smelt,217,San Pablo Bay
+2025,2/10/2025,4,327,9:43,Longfin Smelt,120,San Pablo Bay
+2025,2/10/2025,4,328,9:26,Longfin Smelt,204,San Pablo Bay
+2025,2/10/2025,4,329,8:49,Longfin Smelt,90,San Pablo Bay
+2025,2/10/2025,4,330,11:35,Longfin Smelt,11,San Pablo Bay
+2025,2/10/2025,4,335,9:09,Longfin Smelt,61,San Pablo Bay
+2025,2/10/2025,4,336,8:31,Longfin Smelt,185,San Pablo Bay
+2025,2/10/2025,4,404,12:41,Longfin Smelt,166,Suisun Bay and West
+2025,2/10/2025,4,405,13:02,Longfin Smelt,45,Suisun Bay and West
+2025,2/10/2025,4,809,8:17,Longfin Smelt,2,Central & South Delta
+2025,2/10/2025,4,812,9:31,Longfin Smelt,4,Central & South Delta
+2025,2/10/2025,4,815,9:57,Longfin Smelt,1,Central & South Delta
+2025,2/10/2025,4,901,8:45,No LFS Catch,0,Central & South Delta
+2025,2/10/2025,4,902,10:26,No LFS Catch,0,Central & South Delta
+2025,2/10/2025,4,906,14:42,Longfin Smelt,2,Central & South Delta
+2025,2/10/2025,4,910,14:16,Longfin Smelt,1,Central & South Delta
+2025,2/10/2025,4,912,13:48,No LFS Catch,0,Central & South Delta
+2025,2/10/2025,4,914,12:50,Longfin Smelt,1,Central & South Delta
+2025,2/10/2025,4,915,12:02,Longfin Smelt,3,Central & South Delta
+2025,2/10/2025,4,918,11:20,No LFS Catch,0,Central & South Delta
+2025,2/10/2025,4,919,15:15,Longfin Smelt,1,Central & South Delta
+2025,2/11/2025,4,338,8:55,Longfin Smelt,183,San Pablo Bay
+2025,2/11/2025,4,340,9:16,Longfin Smelt,28,Napa River
+2025,2/11/2025,4,342,9:45,Longfin Smelt,22,Napa River
+2025,2/11/2025,4,343,10:07,Longfin Smelt,34,Napa River
+2025,2/11/2025,4,344,10:40,Longfin Smelt,55,Napa River
+2025,2/11/2025,4,345,11:25,Longfin Smelt,42,Napa River
+2025,2/11/2025,4,346,11:50,Longfin Smelt,6,Napa River
+2025,2/11/2025,4,347,12:13,Longfin Smelt,1,Napa River
+2025,2/11/2025,4,348,12:38,Longfin Smelt,1,Napa River
+2025,2/11/2025,4,349,12:54,No LFS Catch,0,Napa River
+2025,2/11/2025,4,401,8:32,Longfin Smelt,15,Suisun Bay and West
+2025,2/11/2025,4,513,12:43,Longfin Smelt,1,Confluence
+2025,2/11/2025,4,520,13:19,Longfin Smelt,2,Confluence
+2025,2/11/2025,4,703,11:47,No LFS Catch,0,Sacramento River System
+2025,2/11/2025,4,704,11:30,Longfin Smelt,2,Sacramento River System
+2025,2/11/2025,4,705,8:46,Longfin Smelt,2,Sacramento River System
+2025,2/11/2025,4,706,11:07,Longfin Smelt,2,Sacramento River System
+2025,2/11/2025,4,707,9:05,Longfin Smelt,1,Sacramento River System
+2025,2/11/2025,4,711,9:34,No LFS Catch,0,Sacramento River System
+2025,2/11/2025,4,716,10:04,No LFS Catch,0,Sacramento River System
+2025,2/11/2025,4,723,10:23,Longfin Smelt,1,Sacramento River System
+2025,2/11/2025,4,804,12:13,Longfin Smelt,1,Confluence
+2025,2/12/2025,4,501,10:37,Longfin Smelt,2,Suisun Bay and West
+2025,2/12/2025,4,504,11:25,Longfin Smelt,3,Suisun Bay and West
+2025,2/12/2025,4,508,11:50,Longfin Smelt,3,Confluence
+2025,2/12/2025,4,519,11:04,Longfin Smelt,3,Suisun Bay and West
+2025,2/12/2025,4,602,9:37,Longfin Smelt,3,Suisun Bay and West
+2025,2/12/2025,4,606,9:09,Longfin Smelt,1,Suisun Bay and West
+2025,2/12/2025,4,609,8:41,No LFS Catch,0,Suisun Bay and West
+2025,2/12/2025,4,610,8:13,Longfin Smelt,1,Suisun Bay and West
+2025,2/12/2025,4,801,7:37,No LFS Catch,0,Confluence
+2025,2/24/2025,5,306,11:25,Longfin Smelt,1,San Pablo Bay
+2025,2/24/2025,5,308,11:06,Longfin Smelt,4,San Pablo Bay
+2025,2/24/2025,5,311,11:47,Longfin Smelt,9,San Pablo Bay
+2025,2/24/2025,5,315,10:46,Longfin Smelt,8,San Pablo Bay
+2025,2/24/2025,5,322,12:07,Longfin Smelt,1,San Pablo Bay
+2025,2/24/2025,5,323,12:48,Longfin Smelt,30,San Pablo Bay
+2025,2/24/2025,5,327,10:26,Longfin Smelt,1,San Pablo Bay
+2025,2/24/2025,5,328,10:08,Longfin Smelt,63,San Pablo Bay
+2025,2/24/2025,5,329,9:30,Longfin Smelt,8,San Pablo Bay
+2025,2/24/2025,5,330,12:25,Longfin Smelt,6,San Pablo Bay
+2025,2/24/2025,5,335,9:49,Longfin Smelt,18,San Pablo Bay
+2025,2/24/2025,5,336,9:12,Longfin Smelt,105,San Pablo Bay
+2025,2/24/2025,5,338,13:13,Longfin Smelt,27,San Pablo Bay
+2025,2/24/2025,5,401,13:37,Longfin Smelt,76,Suisun Bay and West
+2025,2/24/2025,5,809,8:54,Longfin Smelt,1,Central & South Delta
+2025,2/24/2025,5,812,9:21,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,815,9:46,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,901,10:12,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,902,10:49,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,906,14:37,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,910,14:15,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,912,13:50,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,914,12:50,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,915,12:25,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,918,11:41,No LFS Catch,0,Central & South Delta
+2025,2/24/2025,5,919,15:13,No LFS Catch,0,Central & South Delta
+2025,2/25/2025,5,340,10:47,Longfin Smelt,245,Napa River
+2025,2/25/2025,5,342,11:15,Longfin Smelt,243,Napa River
+2025,2/25/2025,5,343,11:39,Longfin Smelt,779,Napa River
+2025,2/25/2025,5,344,12:12,Longfin Smelt,289,Napa River
+2025,2/25/2025,5,345,12:55,Longfin Smelt,452,Napa River
+2025,2/25/2025,5,346,13:15,Longfin Smelt,277,Napa River
+2025,2/25/2025,5,347,13:34,Longfin Smelt,3,Napa River
+2025,2/25/2025,5,348,13:54,No LFS Catch,0,Napa River
+2025,2/25/2025,5,349,14:13,No LFS Catch,0,Napa River
+2025,2/25/2025,5,404,10:14,Longfin Smelt,202,Suisun Bay and West
+2025,2/25/2025,5,405,9:54,Longfin Smelt,211,Suisun Bay and West
+2025,2/25/2025,5,520,13:16,Longfin Smelt,7,Confluence
+2025,2/25/2025,5,703,12:09,Longfin Smelt,2,Sacramento River System
+2025,2/25/2025,5,704,11:49,Longfin Smelt,9,Sacramento River System
+2025,2/25/2025,5,705,8:34,No LFS Catch,0,Sacramento River System
+2025,2/25/2025,5,706,11:31,Longfin Smelt,2,Sacramento River System
+2025,2/25/2025,5,707,8:50,Longfin Smelt,3,Sacramento River System
+2025,2/25/2025,5,711,9:16,No LFS Catch,0,Sacramento River System
+2025,2/25/2025,5,716,9:44,No LFS Catch,0,Sacramento River System
+2025,2/25/2025,5,723,10:02,No LFS Catch,0,Sacramento River System
+2025,2/25/2025,5,801,12:55,Longfin Smelt,13,Confluence
+2025,2/25/2025,5,804,12:32,Longfin Smelt,1,Confluence
+2025,2/26/2025,5,411,10:47,Longfin Smelt,211,Suisun Bay and West
+2025,2/26/2025,5,418,10:25,Longfin Smelt,42,Suisun Bay and West
+2025,2/26/2025,5,501,11:12,Longfin Smelt,21,Suisun Bay and West
+2025,2/26/2025,5,504,11:57,Longfin Smelt,19,Suisun Bay and West
+2025,2/26/2025,5,508,12:23,Longfin Smelt,18,Confluence
+2025,2/26/2025,5,513,7:54,Longfin Smelt,6,Confluence
+2025,2/26/2025,5,519,11:37,Longfin Smelt,5,Suisun Bay and West
+2025,2/26/2025,5,602,10:00,Longfin Smelt,15,Suisun Bay and West
+2025,2/26/2025,5,606,9:31,Longfin Smelt,1,Suisun Bay and West
+2025,2/26/2025,5,609,9:02,Longfin Smelt,2,Suisun Bay and West
+2025,2/26/2025,5,610,8:29,Longfin Smelt,14,Suisun Bay and West
+2025,3/10/2025,6,306,10:52,No LFS Catch,0,San Pablo Bay
+2025,3/10/2025,6,308,10:33,No LFS Catch,0,San Pablo Bay
+2025,3/10/2025,6,311,11:13,No LFS Catch,0,San Pablo Bay
+2025,3/10/2025,6,315,10:15,No LFS Catch,0,San Pablo Bay
+2025,3/10/2025,6,322,11:30,Longfin Smelt,1,San Pablo Bay
+2025,3/10/2025,6,323,12:07,No LFS Catch,0,San Pablo Bay
+2025,3/10/2025,6,327,9:58,Longfin Smelt,1,San Pablo Bay
+2025,3/10/2025,6,328,9:41,Longfin Smelt,1,San Pablo Bay
+2025,3/10/2025,6,329,9:06,Longfin Smelt,22,San Pablo Bay
+2025,3/10/2025,6,330,11:47,No LFS Catch,0,San Pablo Bay
+2025,3/10/2025,6,335,9:24,Longfin Smelt,5,San Pablo Bay
+2025,3/10/2025,6,336,8:48,Longfin Smelt,39,San Pablo Bay
+2025,3/10/2025,6,404,13:20,Longfin Smelt,21,Suisun Bay and West
+2025,3/10/2025,6,405,12:59,Longfin Smelt,90,Suisun Bay and West
+2025,3/10/2025,6,809,8:22,Longfin Smelt,5,Central & South Delta
+2025,3/10/2025,6,812,8:49,No LFS Catch,0,Central & South Delta
+2025,3/10/2025,6,815,9:14,Longfin Smelt,1,Central & South Delta
+2025,3/10/2025,6,901,9:41,No LFS Catch,0,Central & South Delta
+2025,3/10/2025,6,902,10:12,No LFS Catch,0,Central & South Delta
+2025,3/10/2025,6,906,14:37,No LFS Catch,0,Central & South Delta
+2025,3/10/2025,6,910,14:12,No LFS Catch,0,Central & South Delta
+2025,3/10/2025,6,912,13:44,No LFS Catch,0,Central & South Delta
+2025,3/10/2025,6,914,12:32,No LFS Catch,0,Central & South Delta
+2025,3/10/2025,6,915,12:05,No LFS Catch,0,Central & South Delta
+2025,3/10/2025,6,918,11:08,No LFS Catch,0,Central & South Delta
+2025,3/10/2025,6,919,15:13,No LFS Catch,0,Central & South Delta
+2025,3/11/2025,6,338,8:57,Longfin Smelt,7,San Pablo Bay
+2025,3/11/2025,6,340,9:19,Longfin Smelt,9,Napa River
+2025,3/11/2025,6,342,9:48,Longfin Smelt,7,Napa River
+2025,3/11/2025,6,343,10:10,Longfin Smelt,30,Napa River
+2025,3/11/2025,6,344,10:43,Longfin Smelt,316,Napa River
+2025,3/11/2025,6,345,11:04,Longfin Smelt,1024,Napa River
+2025,3/11/2025,6,346,11:46,Longfin Smelt,1908,Napa River
+2025,3/11/2025,6,347,12:05,Longfin Smelt,297,Napa River
+2025,3/11/2025,6,348,12:28,Longfin Smelt,32,Napa River
+2025,3/11/2025,6,349,12:51,Longfin Smelt,2,Napa River
+2025,3/11/2025,6,401,8:37,Longfin Smelt,36,Suisun Bay and West
+2025,3/11/2025,6,513,14:00,Longfin Smelt,19,Confluence
+2025,3/11/2025,6,520,12:35,Longfin Smelt,16,Confluence
+2025,3/11/2025,6,703,11:41,Longfin Smelt,3,Sacramento River System
+2025,3/11/2025,6,704,11:21,Longfin Smelt,7,Sacramento River System
+2025,3/11/2025,6,705,8:23,No LFS Catch,0,Sacramento River System
+2025,3/11/2025,6,706,11:01,Longfin Smelt,5,Sacramento River System
+2025,3/11/2025,6,707,8:42,No LFS Catch,0,Sacramento River System
+2025,3/11/2025,6,711,9:16,No LFS Catch,0,Sacramento River System
+2025,3/11/2025,6,716,9:43,Longfin Smelt,2,Sacramento River System
+2025,3/11/2025,6,723,10:01,Longfin Smelt,1,Sacramento River System
+2025,3/11/2025,6,804,12:09,Longfin Smelt,7,Confluence
+2025,3/12/2025,6,411,9:47,Longfin Smelt,441,Suisun Bay and West
+2025,3/12/2025,6,418,10:08,Longfin Smelt,190,Suisun Bay and West
+2025,3/12/2025,6,501,9:25,Longfin Smelt,140,Suisun Bay and West
+2025,3/12/2025,6,504,9:03,Longfin Smelt,528,Suisun Bay and West
+2025,3/12/2025,6,508,8:22,No LFS Catch,0,Confluence
+2025,3/12/2025,6,519,8:43,Longfin Smelt,36,Suisun Bay and West
+2025,3/12/2025,6,602,10:31,Longfin Smelt,300,Suisun Bay and West
+2025,3/13/2025,6,606,9:03,Longfin Smelt,2,Suisun Bay and West
+2025,3/13/2025,6,609,9:35,No LFS Catch,0,Suisun Bay and West
+2025,3/13/2025,6,610,10:04,Longfin Smelt,5,Suisun Bay and West
+2025,3/13/2025,6,801,10:39,Longfin Smelt,10,Confluence
