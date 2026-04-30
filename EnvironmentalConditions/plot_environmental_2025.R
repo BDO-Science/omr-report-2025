@@ -11,6 +11,10 @@ library(readxl)
 library(gridExtra)
 library(deltafish)
 
+
+
+setwd("C:/Users/lmccormick/OneDrive - DOI/Documents/Research/R/omr-report-2025/EnvironmentalConditions")
+
 # This file pulls and plots the environmental data for Smelt OMR Season for the 2023 OMR Seasonal Report.
 # modified by G.Easterbrook (geasterbrook@usbr.gov), data pulling code derived from code by N. Bertrand
 # Last edited by L. McCormick (lmccormick@usbr.gov) for 2025 OMR report
@@ -25,8 +29,9 @@ library(deltafish)
 #qwest0 <- read_excel("C:/My Projects/SMT/OMR seasonal report/Controlling Factors Table WY 2034.xlsx", 
 #sheet = "OCOD Data 2023")
 
-qwest0 <- read_excel("C:/My Projects/SMT/OMR seasonal report/Controlling Factors Table WY 2024.xlsx", 
-                     sheet = "OCOD Data 2024")
+qwest0 <- read_excel("2025-OMR-report.xlsx", 
+                     sheet = "Sheet1")
+
 
 qwest <- qwest0 %>%
   select(Date, QWESTcfs) %>%
@@ -39,7 +44,6 @@ qwest <- qwest0 %>%
 # sets the dates to be pulled from cdec for the OMR season
 
 start.date <- "2024-10-01"
-start.date.FPT <- "2024-10-01"
 end.date <- "2025-06-30"
 
 # Series of cdec queries to pull data needed to fill out the reports datafile ------------
@@ -68,11 +72,11 @@ OSJ.fnu <- cdec_query("OSJ", "221", "D", start.date, end.date) %>%
   rename(date = datetime) %>%
   mutate(date = as.Date(date))
 
-FPT.cfs <- cdec_query("FPT", "20", "D", start.date.FPT, end.date)%>%
+FPT.cfs <- cdec_query("FPT", "20", "D", start.date, end.date)%>%
   rename(date = datetime)%>%
   mutate(date = as.Date(date))
 
-FPT.fnu <- cdec_query("FPT", "221", "D", start.date.FPT, end.date)%>%
+FPT.fnu <- cdec_query("FPT", "221", "D", start.date, end.date)%>%
   rename(date = datetime)%>%
   mutate(date = as.Date(date))
 
@@ -224,21 +228,22 @@ theme_plots <- theme(axis.title.x = element_blank(),
                      axis.text = element_text(size = 11),
                      axis.title = element_text(size = 12))
 #uncomment once qwest data is received 
-# (plot_qwest <- ggplot(qwest) + 
-#     geom_hline(yintercept = 0,  linewidth = 1, linetype = "dashed", color = "gray70") +
-#     geom_line(aes(Date, QWESTcfs)) +
-#     scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
-#     labs(y = "QWEST (cfs)") +
-#     theme_bw() +
-#     theme_plots)
+(plot_qwest <- ggplot(qwest) +
+    geom_hline(yintercept = 0,  linewidth = 1, linetype = "dashed", color = "gray70") +
+    geom_line(aes(Date, QWESTcfs), linewidth= 0.7) +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+    theme_plots +
+    labs(y = "QWEST (cfs)", x= "Date (WY25)") +
+    scale_y_continuous(limits= c(-10000, 20000), breaks= c(-10000, -5000, 0, 5000, 10000, 15000, 20000))+
+    theme_bw())
 
 
 (plot_obi <- ggplot(smelt_env_params) + 
     geom_hline(yintercept = 12,  linewidth = 1, linetype = "dashed", color = "gray70") +
     geom_line(aes(date, smelt_env_params$OBI.fnu.smelt), size=0.6) +
-    annotate(geom= "rect", xmin = as.Date("2025-01-15"), xmax = as.Date("2025-01-17"), 
+    annotate(geom= "rect", xmin = as.Date("2025-01-15"), xmax = as.Date("2025-01-16"), 
              ymin= Inf, ymax= -Inf, color= "orange", fill= "orange", alpha=0.3)+
-    geom_vline(xintercept = as.Date("2025-01-12"), color= "red", alpha=0.8)+
+    geom_vline(xintercept = as.Date("2025-01-12"), color= "red", size= 1, alpha=0.8)+
     scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
     labs(y = "OBI Turbidity (FNU)") +
     ggtitle("A")+
@@ -248,9 +253,9 @@ theme_plots <- theme(axis.title.x = element_blank(),
 (plot_hol <- ggplot(smelt_env_params) + 
     geom_hline(yintercept = 12,  linewidth = 1, linetype = "dashed", color = "gray70") +
     geom_line(aes(date, smelt_env_params$HOL.fnu.smelt), size= 0.6) +
-    annotate(geom= "rect", xmin = as.Date("2025-01-15"), xmax = as.Date("2025-01-17"), 
+    annotate(geom= "rect", xmin = as.Date("2025-01-15"), xmax = as.Date("2025-01-16"), 
              ymin= Inf, ymax= -Inf, color= "orange", fill= "orange", alpha=0.3)+
-    geom_vline(xintercept = as.Date("2025-01-12"), color= "red", alpha=0.8)+
+    geom_vline(xintercept = as.Date("2025-01-12"), color= "red", size = 1, alpha=0.8)+
     scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
     labs(y = "HOL Turbidity (FNU)") +
     ggtitle("B")+
@@ -260,9 +265,9 @@ theme_plots <- theme(axis.title.x = element_blank(),
 (plot_osj <- ggplot(smelt_env_params) + 
     geom_hline(yintercept = 12,  linewidth = 1, linetype = "dashed", color = "gray70") +
     geom_line(aes(date, smelt_env_params$OSJ.fnu.smelt), size= 0.6) +
-    annotate(geom= "rect", xmin = as.Date("2025-01-15"), xmax = as.Date("2025-01-17"), 
+    annotate(geom= "rect", xmin = as.Date("2025-01-15"), xmax = as.Date("2025-01-16"), 
              ymin= Inf, ymax= -Inf, color= "orange", fill= "orange", alpha=0.3)+
-    geom_vline(xintercept = as.Date("2025-01-12"), color= "red", alpha=0.8)+
+    geom_vline(xintercept = as.Date("2025-01-12"), color= "red", size= 1, alpha=0.8)+
     scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
     labs(y = "OSJ Turbidity (FNU)") +
     ggtitle("C")+
@@ -278,7 +283,7 @@ turb_bridge <- grid.arrange(plot_obi, plot_hol, plot_osj, ncol=1)
     geom_line(aes(date, FPT.cfs.smelt), size= 0.6) +
     annotate(geom= "rect", xmin = as.Date("2024-12-19"), xmax = as.Date("2025-01-01"), 
              ymin= Inf, ymax= -Inf, color= "orange", fill="orange", alpha=0.3)+
-    geom_vline(xintercept = as.Date("2024-12-16"), color= "red", alpha=0.8)+
+    geom_vline(xintercept = as.Date("2024-12-16"), color= "red", size= 1, alpha=0.8)+
     scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
     # geom_vline(xintercept = as.numeric(as.Date("2024-01-23")), 
     #            color = "red") +
@@ -293,7 +298,7 @@ turb_bridge <- grid.arrange(plot_obi, plot_hol, plot_osj, ncol=1)
     geom_line(aes(date, FPT.fnu.smelt), linewidth= 0.6) +
     annotate(geom= "rect", xmin = as.Date("2024-12-19"), xmax = as.Date("2025-01-01"), 
              ymin= Inf, ymax= -Inf, color= "orange", fill="orange", alpha=0.3)+
-    geom_vline(xintercept = as.Date("2024-12-16"), color= "red", alpha=0.8)+
+    geom_vline(xintercept = as.Date("2024-12-16"), color= "red", alpha=0.8, size=1)+
     scale_x_date(date_breaks = "1 month", date_labels = "%b") +
     # geom_vline(xintercept = as.numeric(as.Date("2024-01-23")), 
     #            color = "red") +
@@ -312,7 +317,7 @@ grid::grid.draw(rbind(gA, gB)) # use this method so Y axis lines up
 (plot_clc <- ggplot(offramp_env_params) + 
     geom_hline(yintercept = 25, linewidth = 1, linetype = "dashed", color = "gray70") +
     geom_line(aes(date, CLC.C.smelt)) +
-    geom_vline(xintercept = as.Date(c("2025-06-28", "2025-06-29")), 
+    geom_vline(xintercept = as.Date(c("2025-06-28", "2025-06-29", "2025-06-30")), 
                color= "red", linewidth= 2, alpha=0.3)+
     labs(y = "CLC Temp. (°C)", title = "C") +
     theme_bw() +
