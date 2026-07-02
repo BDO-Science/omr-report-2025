@@ -1,0 +1,406 @@
+---
+title: "OMR Report"
+author: "Katie"
+date: '2025-7-11'
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Load packages
+```{r}
+library(tidyverse)
+library(lubridate)
+library(ggpubr)
+library(cder)
+library(zoo)
+```
+# Chipps figure
+```{r}
+#data provided by Jonathan Speegle
+
+chipps <- read.csv("LongfinSmelt/Data/Chipps Island_LFS_Oct2024-Jun2025.csv", stringsAsFactors = F)
+chipps$SampleDate<-mdy(chipps$SampleDate)
+
+#filter to >60mm
+chipps.ad <- filter(chipps, ForkLength >= 60)
+
+#plot catch over time
+ggplot(data=chipps.ad, aes(x=SampleDate, y=SumOfCount)) +
+    geom_bar(stat="identity") +
+    theme_bw() +
+    ylab("LFS Catch") +
+    xlab("Month") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b")
+
+ggsave("LongfinSmelt/Plots/chipps_plot.png", height=4, width=7, units="in")
+```
+# SLS & 20mm figure
+```{r}
+#data provided by Vanessa Mora, standardize data names between files before reading in
+
+twentymm <- read.csv("LongfinSmelt/Data/20-mm LFS Catch Data 2025.csv", stringsAsFactors = F)
+twentymm$SampleDate<-mdy(twentymm$SampleDate)
+twentymm$SurveyType <- "20-mm"
+
+sls <- read.csv("LongfinSmelt/Data/SLS LFS Catch Data 2025.csv", stringsAsFactors = F)
+sls$SampleDate<-mdy(sls$SampleDate)
+sls$SurveyType <- "SLS"
+
+#combine datasets (requires equal number of columns with matching names)
+twentymm2 <- twentymm[c(1:4, 7:10)] #removes tow columns
+sls2 <- sls[c(1:4,6:9)] # removes start time column
+
+survey <- rbind(twentymm2,sls2)
+head(survey$SampleDate, 20)
+
+survey$my <- format(as.Date(survey$SampleDate, format="%Y/%m/%d"),"%m/%y")
+survey <- survey %>% 
+  filter(SampleDate <= as.Date("2025-06-30"))
+
+#get total catch per region to inform text updates
+year<-survey %>% 
+  group_by(Region) %>% 
+  summarize("Count"= sum(Catch))
+
+#get total catch by month to inform text updates
+totalm<-survey %>% 
+  group_by(my) %>% 
+  summarize("Count"= sum(Catch))
+
+#plot by survey
+#get monthly catch
+month <-survey%>%
+  group_by(Region, SurveyType, my) %>% 
+  summarize("Count"= sum(Catch))
+
+unique(month$my)
+month$my<-factor(month$my, levels=c("12/24", "01/25", "02/25", "03/25","04/25","05/25", "06/25"))#force to recognize levels
+
+#plot
+ggplot(data=month, aes(x=my, y=Count, fill=Region)) +
+    geom_bar(stat = "identity", position="dodge2",  colour="black") +
+    facet_wrap(~SurveyType, ncol=1, scales = "free_y") +
+    theme_bw() +
+    ylab("Count of LFS") +
+    xlab("Month") +
+    theme(legend.position = "right") +
+    theme(text = element_text(size = 14)) +
+    theme(axis.text = element_text(size = 13)) +
+    scale_fill_viridis_d()
+    
+ggsave("LongfinSmelt/Plots/catch_plot2.png", height=8, width=8.5, units="in")
+```
+# SLS & 20mm CSD stations figure
+```{r}
+#survey plot-------------------------------
+survey.csd <- filter(survey, Region == "Central & South Delta")
+survey.csd$Station<-as.character(survey.csd$Station)
+#create a new column for type and survey #
+survey.csd$TypeSurv <- paste(survey.csd$SurveyType, survey.csd$Survey, sep=" ")
+survey.csd$SampleDate <- format(as.Date(survey.csd$SampleDate, format="%Y/%m/%d"),"%m/%d/%y")
+
+#sum by station
+csd.surv1<-survey.csd %>% 
+  group_by(SampleDate, SurveyType, TypeSurv, Station, Survey) %>% 
+  summarize("Count"= sum(Catch))
+
+csd.surv1$Detec <- ifelse(csd.surv1$Count>0, 1, 0)
+unique(csd.surv1$SurveyType)
+#sum stations with detection by survey
+csd.surv<-csd.surv1 %>% 
+  group_by(SurveyType, TypeSurv) %>% 
+  summarize("detections"= sum(Detec))
+unique(csd.surv$TypeSurv)
+csd.surv$TypeSurv <- factor(csd.surv$TypeSurv, levels=c("SLS 12", "SLS 13", "SLS 1", "SLS 2", "SLS 3", "SLS 4", "SLS 5",  "SLS 6", "20-mm 1", "20-mm 2", "20-mm 3", "20-mm 4", "20-mm 5", "20-mm 6", "20-mm 7", "20-mm 8"))
+csd.surv$SurveyType <- factor(csd.surv$SurveyType, levels=c("SLS", "20-mm"))
+
+#plot
+cbbPalette <- c("#999999", "#E69F00")
+
+su <- ggplot(data=csd.surv, aes(x=TypeSurv, y=detections, fill=SurveyType)) +
+    geom_bar(stat = "identity", position="dodge2", width = 0.6, colour="black") +
+    theme_bw() +
+    ylab("Count of CSD stations with LFS detections") +
+    xlab("Survey") +
+    labs(fill='Survey') +
+    scale_fill_manual(values=cbbPalette) +
+    theme(axis.text.x = element_text(angle = 90))
+su
+surv <- su + geom_hline(yintercept=4, linetype="dashed", color = "black", linewidth = .8)
+surv
+
+#station plot------------------------------
+#average by station
+csd.stat<-survey.csd %>% 
+  group_by(TypeSurv, SurveyType, Station) %>% 
+  summarize("Count"= mean(Catch))
+
+#verify that all surveys had catch
+catch <- filter(csd.stat, Count > 0.0000000)
+unique(catch$TypeSurv)
+
+csd.stat$TypeSurv <- factor(csd.stat$TypeSurv, levels=c("SLS 12", "SLS 13", "SLS 1", "SLS 2", "SLS 3", "SLS 4", "SLS 5",  "SLS 6", "20-mm 1", "20-mm 2", "20-mm 3", "20-mm 4", "20-mm 5", "20-mm 6", "20-mm 7", "20-mm 8"))
+
+#see which stations had catch
+unique(catch$Station)
+
+#filter to just those surveys and stations with non-zero catch to make the plot easier to view
+csd.stat2 <- filter(csd.stat, Station %in% c( "809", "815", "902", "906", "812" ,"918", "901" ,"914", "915", "910", "919"))
+csd.stat3 <- filter(csd.stat2, TypeSurv %in% c("SLS 12", "SLS 13", "SLS 1","SLS 2", "SLS 3","SLS 4","SLS 5","SLS 6","20-mm 1", "20-mm 2", "20-mm 4", "20-mm 5", "20mm"))
+
+#plot catch by station
+s <- ggplot(data=csd.stat3, aes(x=TypeSurv, y=Count, fill=Station)) +
+    geom_col(position = position_dodge2(width = 0.9, preserve = "single"), colour="black") +
+    theme_bw() +
+    ylab("Average catch per tow of LFS (at CSD stations)") +
+    xlab("Survey Date") +
+    scale_fill_viridis_d() +
+    theme(axis.text.x = element_text(angle = 90))
+s
+stat <- s + geom_hline(yintercept=5, linetype="dashed", color = "black", size = .8)
+stat
+
+#combine----------------------------------
+
+figure <- ggarrange(surv, stat,
+                    labels = c("A)", "B)"), hjust = -2.5, vjust = 2.5,
+                    ncol = 1, nrow = 2)
+figure
+
+ggsave("LongfinSmelt/Plots/survey_station_plot.png", height=8, width=7, units="in")
+```
+
+#Annual Status report plots
+```{r}
+################8.4.2#####################
+csd.stat4 <- filter(csd.stat, Station %in% c( "809", "812"))
+csd.stat4$TypeSurv <- factor(csd.stat4$TypeSurv, levels=c("SLS 12", "SLS 13", "SLS 1", "SLS 2", "SLS 3", "SLS 4", "SLS 5",  "SLS 6", "20-mm 1", "20-mm 2", "20-mm 3", "20-mm 4", "20-mm 5", "20-mm 6", "20-mm 7", "20-mm 8"))
+
+s <- ggplot(data=csd.stat4, aes(x=TypeSurv, y=Count, fill=Station)) +
+    geom_col(position = position_dodge2(width = 0.9, preserve = "single"), colour="black") +
+    geom_hline(yintercept=50, linetype="dashed", color = "black", size = .8) +
+    annotate("rect",
+             xmin = 3.5,  
+             xmax = 5.5, 
+             ymin = -Inf, ymax = Inf,
+             alpha = 0.2, fill = "red") +
+    theme_bw() +
+    ylab("Avg LFS catch") +
+    xlab("") +
+    scale_fill_viridis_d() +
+    theme(axis.text.x = element_text(angle = 90))
+
+#plot seasonal salvage
+salvageLFS <- read.csv("LongfinSmelt/Data/Total.Salvage_2025.csv",  stringsAsFactors = F)
+salvageLFS$Date<-mdy(salvageLFS$DATE)
+
+salvageLFS$State.Season.Salvage<-as.numeric(salvageLFS$State.Season.Salvage)
+salvageLFS$Federal.Season.Salvage<-as.numeric(salvageLFS$Federal.Season.Salvage)
+
+sal <- ggplot() +
+    geom_line(data=salvageLFS, aes(x=Date, y=State.Season.Salvage), color="blue", linewidth=1) +
+    geom_line(data=salvageLFS, aes(x=Date, y=Federal.Season.Salvage), color="orange", linewidth=1, position=position_dodge(width=0.2)) +
+   geom_text(
+    data = salvage %>% slice_tail(n = 1),
+    aes(x = as.Date("2025-06-01"), y = 140, label = "Federal Salvage"),
+    color = "black")+
+  geom_text(
+    data = salvage %>% slice_tail(n = 1),
+    aes(x = as.Date("2025-06-01"), y = 70, label = "State Salvage"),
+    color = "black") +
+  geom_vline(xintercept = as.Date("2025-01-19"), color = "red", linewidth = 1) + #triggered on 12/16/24
+  geom_vline(xintercept = as.Date("2025-01-28"), color = "red", linewidth = 1) + #triggered on 12/16/24
+    annotate("rect",
+             xmin = as.Date("2025-01-20"),
+             xmax = as.Date("2025-01-26"),
+             ymin = -Inf, ymax = Inf,
+             alpha = 0.2, fill = "orange") +
+  annotate("rect",
+             xmin = as.Date("2025-02-05"),
+             xmax = as.Date("2025-03-07"),
+             ymin = -Inf, ymax = Inf,
+             alpha = 0.2, fill = "grey") +
+    theme_bw() +
+    ylab("LFS Seasonal Salvage") +
+    xlab("Date") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+    theme(axis.text = element_text(size = 12)) 
+
+figure <- ggarrange(s, sal,
+                    labels = c("A)", "B)"), hjust = 0, vjust = 1,
+                    ncol = 1, nrow = 2)
+figure
+
+ggsave("LongfinSmelt/Plots/SurveySalvage.png", height=8, width=8.5, units="in")
+
+
+```
+
+```{r}
+#Create salvage plots for various actions
+
+salvageDS <- read.csv("DeltaSmelt/data/Total.Salvage_2025.csv",  stringsAsFactors = F)
+salvageDS$Date<-mdy(salvageDS$DATE)
+
+#plot seasonal salvage
+salvageDS$Federal.Season.Salvage.Adult<-as.numeric(salvageDS$Federal.Season.Salvage.Adult)
+salvageDS$Federal.Season.Salvage.Juvenile<-as.numeric(salvageDS$Federal.Season.Salvage.Juvenile)
+
+DS <-ggplot() +
+    geom_line(data=salvageDS, aes(x=Date, y=Federal.Season.Salvage.Adult), color="blue", linewidth=1) +
+    geom_line(data=salvageDS, aes(x=Date, y=Federal.Season.Salvage.Juvenile), color="orange", linewidth=1, position=position_dodge(width=0.2)) +
+    geom_text(
+    data = salvageDS %>% slice_tail(n = 1),
+    aes(x = as.Date("2025-04-01"), y = 16, label = "Adult Seasonal Salvage"),
+    color = "black")+
+  geom_text(
+    data = salvageDS %>% slice_tail(n = 1),
+    aes(x = as.Date("2025-04-01"), y = 1, label = "Juvenile Seasonal Salvage"),
+    color = "black") +
+    theme_bw() +
+    ylab("DS Seasonal Salvage") +
+    xlab("Date") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+    theme(axis.text = element_text(size = 12)) 
+
+##########Can skip the following if LFS salvage already read in
+salvageLFS <- read.csv("LongfinSmelt/Data/Total.Salvage_2025.csv",  stringsAsFactors = F)
+salvageLFS$Date<-mdy(salvageLFS$DATE)
+
+salvageLFS$State.Season.Salvage<-as.numeric(salvageLFS$State.Season.Salvage)
+salvageLFS$Federal.Season.Salvage<-as.numeric(salvageLFS$Federal.Season.Salvage)
+#######End skippable portion
+
+LFS <- ggplot() +
+    geom_line(data=salvageLFS, aes(x=Date, y=State.Season.Salvage), color="blue", linewidth=1) +
+    geom_line(data=salvageLFS, aes(x=Date, y=Federal.Season.Salvage), color="orange", linewidth=1, position=position_dodge(width=0.2)) +
+   geom_text(
+    data = salvageLFS %>% slice_tail(n = 1),
+    aes(x = as.Date("2025-06-01"), y = 140, label = "Federal Salvage"),
+    color = "black")+
+  geom_text(
+    data = salvageLFS %>% slice_tail(n = 1),
+    aes(x = as.Date("2025-06-01"), y = 70, label = "State Salvage"),
+    color = "black") +
+    theme_bw() +
+    ylab("LFS Seasonal Salvage") +
+    xlab("Date") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+    theme(axis.text = element_text(size = 12)) 
+
+figure2 <- ggarrange(DS, LFS,
+                    labels = c("A)", "B)"), hjust = 0, vjust = 1,
+                    ncol = 1, nrow = 2)
+figure2
+
+ggsave("LongfinSmelt/Plots/SalvageDS_LFS.png", height=8, width=8.5, units="in")
+```
+
+
+#QWest figure
+```{r}
+SJJ = cdec_query("SJJ", 20, start.date = ymd("2025-10-01"), end.date = ymd("2025-6-30"))
+ggplot(SJJ, aes(x = ObsDate, y = Value)) + geom_line()
+#rolling 7-day average
+SJJave = SJJ %>%
+  mutate(Date = date(ObsDate)) %>%
+  group_by(Date) %>%
+  summarize(Flow = mean(Value, na.rm =T)) %>%
+  mutate(roll7 = rollmean(Flow, 7, fill = NA))
+ggplot(SJJave, aes(x = Date, y = roll7))  +
+  geom_line(aes(x = Date, y = roll7), color = "black", size=0.5)+
+  theme_bw() +
+  ylab("QWest (cfs)") +
+  xlab("Date")
+```
+# Salvage & OMR flow figure
+```{r}
+#data from: Walter Griffiths
+
+salvage <- read.csv("LongfinSmelt/Data/Total.Salvage_2025.csv",  stringsAsFactors = F)
+salvage$Date<-mdy(salvage$DATE)
+
+#plot seasonal salvage
+salvage$State.Season.Salvage<-as.numeric(salvage$State.Season.Salvage)
+salvage$Federal.Season.Salvage<-as.numeric(salvage$Federal.Season.Salvage)
+
+sal <- ggplot() +
+    geom_line(data=salvage, aes(x=Date, y=State.Season.Salvage), color="blue", linewidth=1) +
+    geom_line(data=salvage, aes(x=Date, y=Federal.Season.Salvage), color="orange", linewidth=1, position=position_dodge(width=0.2)) +
+   geom_text(
+    data = salvage %>% slice_tail(n = 1),
+    aes(x = as.Date("2025-06-01"), y = 140, label = "Federal Salvage"),
+    color = "black")+
+  geom_text(
+    data = salvage %>% slice_tail(n = 1),
+    aes(x = as.Date("2025-06-01"), y = 70, label = "State Salvage"),
+    color = "black") +
+  geom_vline(xintercept = as.Date("2025-01-19"), color = "red", linewidth = 1) + #triggered on 12/16/24
+  geom_vline(xintercept = as.Date("2025-01-28"), color = "red", linewidth = 1) + #triggered on 12/16/24
+    annotate("rect",
+             xmin = as.Date("2025-01-20"),
+             xmax = as.Date("2025-01-26"),
+             ymin = -Inf, ymax = Inf,
+             alpha = 0.2, fill = "orange") +
+  annotate("rect",
+             xmin = as.Date("2025-02-05"),
+             xmax = as.Date("2025-03-07"),
+             ymin = -Inf, ymax = Inf,
+             alpha = 0.2, fill = "grey") +
+    theme_bw() +
+    ylab("LFS Seasonal Salvage") +
+    xlab("Date") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+    theme(axis.text = element_text(size = 12)) 
+
+#plot flow
+salvage$OMR <- as.numeric(gsub(",", "", salvage$Middle...Old.R.Net.Daily.Flow..cfs.))
+
+flow <- ggplot() +
+    geom_line(data=salvage, aes(x=Date, y= OMR), linewidth=1) +
+    theme_bw() +
+    ylab("Middle + Old River net daily flow (cfs)") +
+    xlab("Date") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b")+
+    theme(axis.text = element_text(size = 12)) 
+
+figure <- ggarrange(sal, flow,
+                    labels = c("A", "B"),
+                    ncol = 1, nrow = 2)
+figure
+
+ggsave("LongfinSmelt/Plots/2024salvage.png", height=7, width=8, units="in")
+```
+# LES figure
+```{r}
+#data provided by Morgan Gilbert
+
+les <- read.csv("LongfinSmelt/Data/LES_LFS.csv", stringsAsFactors = F)
+view(les)
+les$Date<-mdy(les$Date)
+les$SampleWeek<-mdy(les$SampleWeek)
+
+#filter to LFS
+les.lfs <- filter(les, CommonName=="LongfinSmelt")
+
+#consolidate to total catch of LFS by survey week
+les.lfs$dm <- format(as.Date(les.lfs$SampleWeek, format="%m/%Y/%d"))
+
+#get total catch per region to inform text updates
+week<-les %>% 
+  group_by(SampleWeek) %>% 
+  summarize("Count"= sum(Catch))
+
+view(week)
+week$SampleWeek<-as.Date(week$dm)
+
+#plot catch over time
+ggplot(data=week, aes(x=SampleWeek, y=Count)) +
+    geom_bar(stat="identity") +
+    theme_bw() +
+    ylab("LES Weekly Longfin Smelt Catch") +
+    xlab("Month")+
+    scale_x_date(date_breaks = "1 month",minor_breaks = NULL,date_labels = "%b")
+
+ggsave("LongfinSmelt/Plots/2025lesplot.png", height=4, width=7, units="in")
+```
